@@ -1,0 +1,1 @@
+enum Result{SUCCESSFUL, EXCEPTION, IGNORED};
