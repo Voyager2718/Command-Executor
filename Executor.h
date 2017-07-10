@@ -2,22 +2,25 @@
 #define EXECUTOR_H
 
 #include<list>
-#include"ACommand.h"
+#include"Result.h"
+#include"IRunnable.h"
 
 using std::list;
 
 class Executor{
 private:
-    list<ACommand> commands;
+    list<IRunnable> runnables;
 
 public:
-    Executor(ACommand command);
+    Executor(IRunnable runnable);    
 
     virtual ~Executor() = default;
 
     Executor(const Executor& executor) = default;
 
-    Result Execute();
+    virtual void AddRunnable(IRunnable runnable);
+
+    virtual Result Execute();
 };
 
 #endif
