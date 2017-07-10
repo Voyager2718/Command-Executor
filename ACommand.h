@@ -18,6 +18,8 @@ private:
 public:
     ACommand(int timeOut, string description);
 
+    ACommand();
+
     virtual ~ACommand() = default;
 
     ACommand(const ACommand& command) = default;
@@ -25,6 +27,8 @@ public:
     Result Run() = 0;
 
     virtual void SetTimeout(int timeOut);
+
+    virtual int GetTimeout();
 
     virtual void AddValidator(IValidator validator);
 

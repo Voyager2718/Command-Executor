@@ -1,12 +1,18 @@
 #include"ACommand.h"
 
-ACommand::ACommand(int timeOut, string description){
-    this->timeOut = timeOut;
+ACommand::ACommand(int timeout, string description){
+    this->timeout = timeout;
     this->description = description;
 }
 
-void ACommand::SetTimeout(int timeOut){
-    this->timeOut = timeOut;
+ACommand::ACommand(){ }
+
+void ACommand::SetTimeout(int timeout){
+    this->timeout = timeout;
+}
+
+int ACommand::GetTimeout(){
+    return timeout;
 }
 
 void ACommand::AddValidator(IValidator validator){
