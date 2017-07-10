@@ -10,7 +10,7 @@ void Executor::AddRunnable(IRunnable runnable){
 
 /**
  * If there's one or more IGNORED, then return IGNROED after running all runnables.
- * If there's EXCEPTION, stop running following runnables and return EXCEPTION immediately.
+ * If there's FAILED, stop running following runnables and return FAILED immediately.
  * If all runnables are run successfully, then return SUCCESSFUL.
 */
 Result Executor::Execute(){
@@ -20,8 +20,8 @@ Result Executor::Execute(){
         if(result == IGNORED){
             haveIgnored = true;
         }
-        if(result == EXCEPTION){
-            return EXCEPTION;
+        if(result == FAILED){
+            return FAILED;
         }
     }
     return SUCCESSFUL;
