@@ -14,22 +14,22 @@ list< map<string, string> > Report::GetReports(){
 }
 
 void Report::PrintReport(function<void(string, string, string)> = printer){
-    for(auto r : reports){
+    for(auto const& r : reports){
         printer(r["timestamp"], r["result"], r["report"]);
     }
 }
 
 void Report::PrintSuccessfulReport(function<void(string, string, string)> = printer){
-    for(auto r : reports){
-        if(r["result"] == FAILED){
+    for(auto const& r : reports){
+        if(r["result"] == SUCCESSFUL){
             printer(r["timestamp"], r["result"], r["report"]);
         }
     }
 }
 
 void Report::PrintFailedReport(function<void(string, string, string)> = printer){
-    for(auto r : reports){
-        if(r["result"] == SUCCESSFUL){
+    for(auto const& r : reports){
+        if(r["result"] == FAILED or r["result"] == IGNORED){
             printer(r["timestamp"], r["result"], r["report"]);
         }
     }
