@@ -4,13 +4,14 @@
 #include<list>
 #include<map>
 #include<string>
+#include"IRunnable.h"
 #include"ACommand.h"
 
 using std::list;
 using std::map;
 using std::string;
 
-class Transaction{
+class Transaction : public IRunnable{
 private:
     list<ACommand> commands;
     string description;
@@ -21,7 +22,7 @@ public:
 
     ATransaction(string description, bool isParallel = false);
 
-    virtual void Run();
+    virtual void Run(vector<string> params = vector<string>());
 
     bool GetIsParallel();
 

@@ -6,7 +6,7 @@ ATransaction::ATransaction(string description, bool isParallel = false){
 
 ATransaction::ATransaction(bool isParallel = false){ }
 
-void ATransaction::Run(){
+void ATransaction::Run(vector<string> params = vector<string>()){
     // TODO
 }
 

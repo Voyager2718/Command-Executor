@@ -1,15 +1,13 @@
 #ifndef IRUNNABLE_H
 #define IRUNNABLE_H
 
+#include<vector>
+
+using std::vector;
+
 class IRunnable{
 public:
-    IRunnable() = default;
-
-    virtual ~IRunnable() = default;
-
-    virtual IRunnable(const IRunnable& runnable) = default;
-
-    virtual Result Run() = 0;
+    virtual Result Run(vector<string> params = vector<string>()) = 0;
 };
 
 #endif
