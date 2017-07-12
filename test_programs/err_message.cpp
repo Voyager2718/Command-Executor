@@ -1,6 +1,7 @@
 #include<iostream>
+#include<time.h>
+#include<stdlib.h>
 #include"../lib/ytime.h"
-#include"../lib/yrandom.h"
 
 using std::cout;
 using std::endl;
@@ -14,8 +15,9 @@ int main(int argc, char *argv[]){
     }else{
         numberOfLines = 50;
     }
-
-    int errorAtLine = yrandom::Random(0, numberOfLines - 1);
+    
+    srand(time(NULL));
+    int errorAtLine = rand() % numberOfLines;
 
     for(int i = 0; i < numberOfLines; i++){
         cout<<"["<<ytime::GetTime()<<"] Normal output."<<endl;
