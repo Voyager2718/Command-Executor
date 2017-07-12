@@ -21,7 +21,7 @@ class Report final{
 private:
     Report(){}
 
-    list< map<string, string> > reports;    // map<timestamp, user defined report string>
+    list< map<string, string> > reports;    // map{timestamp, user defined report string}
 
     void Printer(string timestamp, string result, string report);
 public:
