@@ -1,5 +1,5 @@
-#ifndef ACOMMAND_H
-#define ACOMMAND_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include<list>
 #include<string>
@@ -10,22 +10,22 @@
 using std::list;
 using std::string;
 
-class ACommand : public IRunnable{
-private:
+class Command : public IRunnable{
+protected:
     int timeout;
     list<IValidator> validators;
     list<IOutputChecker> outputCheckers;
     string description;
 public:
-    ACommand(int timeout, string description);
+    Command(int timeout, string description);
 
-    ACommand();
+    Command();
 
-    virtual ~ACommand() = default;
+    virtual ~Command() = default;
 
-    ACommand(const ACommand& command) = default;
+    Command(const Command& command) = default;
 
-    Result Run(vector<string> params = vector<string>()) = 0;
+    virtual Result Run(vector<string> params = vector<string>());
 
     virtual void SetTimeout(int timeout);
 

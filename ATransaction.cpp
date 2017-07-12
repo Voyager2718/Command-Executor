@@ -1,19 +1,7 @@
-#include"Transaction.h"
+#include"ATransaction.h"
 
-ATransaction::ATransaction(string description, bool isParallel = false){
+ATransaction::ATransaction(string description){
     this->description = description;
 }
 
-ATransaction::ATransaction(bool isParallel = false){ }
-
-void ATransaction::Run(vector<string> params = vector<string>()){
-    // TODO
-}
-
-bool GetIsParallel(){
-    return isParallel;
-}
-
-void SetIsParallel(bool isParallel){
-    this->isParallel = isParallel;
-}
+ATransaction::ATransaction(){ }

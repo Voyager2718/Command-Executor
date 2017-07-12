@@ -1,5 +1,5 @@
-#ifndef TRANSACTION_H
-#define TRANSACTION_H
+#ifndef ATRANSACTION_H
+#define ATRANSACTION_H
 
 #include<list>
 #include<map>
@@ -11,22 +11,16 @@ using std::list;
 using std::map;
 using std::string;
 
-class Transaction : public IRunnable{
-private:
-    list<ACommand> commands;
+class ATransaction : public IRunnable{
+protected:
     string description;
-    bool isParallel;
     list< map< string, string > > values
 public:
-    ATransaction(bool isParallel = false);
+    Transaction();
 
-    ATransaction(string description, bool isParallel = false);
+    Transaction(string description);
 
-    virtual void Run(vector<string> params = vector<string>());
-
-    bool GetIsParallel();
-
-    void SetIsParallel(bool isParallel);
+    virtual void Run(vector<string> params = vector<string>()) = 0;
 };
 
 #endifs

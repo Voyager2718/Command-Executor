@@ -9,7 +9,7 @@ using std::map;
 using std::string;
 
 class AOutputChecker{
-private:
+protected:
     map<string, string> values;
     string description;
     string exceptionDescription;
