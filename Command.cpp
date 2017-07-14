@@ -9,11 +9,11 @@ Command::Command(int timeout, string description){
 
 Command::Command(){
     #if defined _MSC_VER
-        command = "echo \"Windows Command Executor.\"";
+        command = "./test";
     #elif defined __GNUC__
-        command = "echo \"Linux Command Executor.\"";
+        command = "./test";
     #else
-        command = "echo \"Command Executor.\"";
+        command = "./test";
     #endif
 }
 
@@ -21,22 +21,39 @@ Command::Command(){
 Result Command::Run(vector<string> params){
     pid_t pid;
     int status;
+    int fd[2];
+
+    pipe(fd);
+
     if((pid = fork()) < 0){
-        (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Unable to create new process.", FAILED);
+        (Report::GetInstance()).AddReport("[FATAL] FORK-0001: Unable to create new process.", FAILED);
         return FAILED;
     }else if(pid == 0){
-        execl(command.c_str(), NULL);
+        close(fd[0]);
+        bool execStatus = false;
+        if(execlp(command.c_str(), NULL) != 0){
+            execStatus = true;
+            write(fd[1], &execStatus, sizeof(bool));
+        }
     }else{
         wait(&status);
-        if(WEXITSTATUS(status) != 0){
-            (Report::GetInstance()).AddReport("[FATAL] CMD-0002: Process execution failed.", FAILED);
+        bool execIsFailed = false;
+        close(fd[1]);
+        cout<<"?"<<execIsFailed<<endl;
+        execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
+
+        cout<<"?"<<execIsFailed<<endl;
+
+        if(WEXITSTATUS(status) != 0){   
+            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed.", FAILED);
+            return FAILED;
+        }else if(execIsFailed){
+            (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command.", FAILED);
             return FAILED;
         }else{
             (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
             return SUCCESSFUL;
         }
-        (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
-        return SUCCESSFUL;
     }
 }
 
