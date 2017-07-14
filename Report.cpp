@@ -47,5 +47,5 @@ void Report::PrintFailedReport(function<void(string, string, string)> printer){
 }
 
 void Report::Printer(string timestamp, string result, string report){
-    cout<<timestamp<<" - "<<result<<" - "<<report<<endl;
+    cout<<"["<<timestamp<<"] "<<result<<" - "<<report<<endl;
 }

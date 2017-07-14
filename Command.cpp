@@ -20,22 +20,24 @@ Command::Command(){
 // FIXME: Add IValidator and IOutputChecker.
 Result Command::Run(vector<string> params){
     pid_t pid;
-    int returnValue;
-
+    int status;
     if((pid = fork()) < 0){
         (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Unable to create new process.", FAILED);
         return FAILED;
     }else if(pid == 0){
         execl(command.c_str(), NULL);
-    }
-
-    wait(&returnValue);
-    if(returnValue != 0){
-        (Report::GetInstance()).AddReport("[FATAL] CMD-0002: Process execution failed.", FAILED);
     }else{
+        wait(&status);
+        if(WEXITSTATUS(status) != 0){
+            (Report::GetInstance()).AddReport("[FATAL] CMD-0002: Process execution failed.", FAILED);
+            return FAILED;
+        }else{
+            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
+            return SUCCESSFUL;
+        }
+        (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
         return SUCCESSFUL;
     }
-    return SUCCESSFUL;
 }
 
 void Command::SetCommand(string command){

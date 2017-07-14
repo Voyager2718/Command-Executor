@@ -1,11 +1,11 @@
 #include"Executor.h"
 
 void Executor::success(){
-    Report::GetInstance().PrintReport();
+    (Report::GetInstance()).PrintReport();
 }
 
 void Executor::fail(){
-    Report::GetInstance().PrintReport();
+    (Report::GetInstance()).PrintReport();
 }
 
 Executor::Executor(){ }
