@@ -19,7 +19,7 @@ public:
 
     virtual ~AValidator() = default;
 
-    virtual AValidator(const IValidator& validator) = default;
+    AValidator(const AValidator& validator) = default;
 
     virtual Result Verify() = 0;
 

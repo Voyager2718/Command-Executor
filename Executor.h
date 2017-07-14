@@ -4,6 +4,8 @@
 #include<list>
 #include<vector>
 #include<functional>
+#include<memory>
+
 #include"Result.h"
 #include"IRunnable.h"
 #include"Report.h"
@@ -12,29 +14,31 @@ using std::list;
 using std::vector;
 using std::function;
 
+using std::shared_ptr;
+
 class Executor{
+private:
+    static void success();
+
+    static void fail();
 protected:
-    list<IRunnable> runnables;
-
-    virtual void success(){
-        Report::GetInstance().PrintReport();
-    }
-
-    virtual void fail(){
-        Report::GetInstance().PrintReport();
-    }
+    list< shared_ptr<IRunnable> > runnables;
 
 public:
-    Executor(IRunnable runnable);    
+    Executor(shared_ptr<IRunnable> runnable);    
+
+    Executor();
 
     virtual ~Executor() = default;
 
     Executor(const Executor& executor) = default;
 
-    virtual void AddRunnable(IRunnable runnable);
+    virtual void AddRunnable(shared_ptr<IRunnable> runnable);
 
-    virtual Result Execute(function<void()>succ = success, function<void()>fl = fail, vector<string> params = vector<string>());
+    virtual Result Execute();
 
-    virtual Result Execute(vector<string> params = vector<string>(), function<void()>succ = success, function<void()>fl = fail);
+    virtual Result Execute(function<void()>succ, function<void()>fl, vector<string> params = vector<string>());
+
+    virtual Result Execute(vector<string> params, function<void()>succ = success, function<void()>fl = fail);
 };
 #endif

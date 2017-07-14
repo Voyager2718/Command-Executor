@@ -19,7 +19,7 @@ public:
 
     virtual ~AOutputChecker() = default;
 
-    virtual AOutputChecker(const AOutputChecker& outputChecker) = default;
+    AOutputChecker(const AOutputChecker& outputChecker) = default;
 
     virtual Result Check(); // FIXME: Put output into check or use another mechanism?
 

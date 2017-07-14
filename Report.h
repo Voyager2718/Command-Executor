@@ -7,7 +7,7 @@
 #include<iostream>
 #include<functional>
 
-#include"lib/ytime.h"
+#include"lib/ytime/ytime.h"
 #include"Result.h"
 
 using std::list;
@@ -21,9 +21,11 @@ class Report final{
 private:
     Report(){}
 
-    list< map<string, string> > reports;    // map{timestamp, user defined report string}
+    list< map<string, string> > a;    // map{timestamp, user defined report string}
 
-    void Printer(string timestamp, string result, string report);
+    list< map<string, string> > reports;
+
+    static void Printer(string timestamp, string result, string report);
 public:
     static Report& GetInstance();
 
