@@ -4,7 +4,8 @@
 #include"Executor.h"
 #include"Command.h"
 #include"IRunnable.h"
-#include"Transaction.h"
+#include"ParallelTransaction.h"
+#include"ParallelCommand.h"
 
 using std::cout;
 using std::cin;
@@ -15,9 +16,9 @@ using std::make_shared;
 
 int main(int argc, char* argv[]){
     Executor executor;
-    shared_ptr<Transaction> transaction = make_shared<Transaction>();
-    transaction->AddCommand(make_shared<Command>());
-    executor.AddRunnable(transaction);
+    shared_ptr<ParallelTransaction> pTransaction = make_shared<ParallelTransaction>();
+    pTransaction->AddCommand(make_shared<ParallelCommand>());
+    executor.AddRunnable(pTransaction);
     executor.Execute();
     return 0;
 }
