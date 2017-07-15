@@ -18,7 +18,7 @@ void Executor::AddRunnable(shared_ptr<IRunnable> runnable){
     runnables.push_back(runnable);
 }
 
-Result Executor::Execute(void){
+Result Executor::Execute(){
     return Execute(success, fail);
 }
 

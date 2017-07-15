@@ -1,5 +1,6 @@
 #include"ParallelTransaction.h"
 
-void ParallelTransaction::AddCommand(ParallelCommand command){
+void ParallelTransaction::AddCommand(shared_ptr<ParallelCommand> command){
     commands.push_back(command);
 }
+

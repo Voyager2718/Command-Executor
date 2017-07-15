@@ -15,6 +15,7 @@ Command::Command(){
     #else
         command = "./test";
     #endif
+    description = "Command.cpp";
 }
 
 // FIXME: Add IValidator and IOutputChecker.
@@ -39,11 +40,8 @@ Result Command::Run(vector<string> params){
         wait(&status);
         bool execIsFailed = false;
         close(fd[1]);
-        cout<<"?"<<execIsFailed<<endl;
         execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
-
-        cout<<"?"<<execIsFailed<<endl;
-
+        
         if(WEXITSTATUS(status) != 0){   
             (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed.", FAILED);
             return FAILED;

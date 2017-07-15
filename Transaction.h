@@ -3,18 +3,26 @@
 #include<list>
 #include<map>
 #include<string>
+#include<memory>
+#include<functional>
+
 #include"IRunnable.h"
-#include"ACommand.h"
+#include"Command.h"
+#include"Result.h"
+
+using std::string;
 
 using std::list;
 using std::map;
-using std::string;
+
+using std::shared_ptr;
+using std::function;
 
 class Transaction : public ATransaction{
 protected:
-    list<ACommand> commands;
+    list< shared_ptr<Command> > commands;
 public:
-    virtual void AddCommand(ACommand command);
+    virtual void AddCommand(shared_ptr<Command> command);
 
-    virtual void Run(vector<string> params = vector<string>()) override;
+    virtual Result Run(vector<string> params = vector<string>());
 };

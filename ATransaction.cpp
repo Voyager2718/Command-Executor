@@ -4,4 +4,6 @@ ATransaction::ATransaction(string description){
     this->description = description;
 }
 
-ATransaction::ATransaction(){ }
+ATransaction::ATransaction(){
+    description = "ATransaction.cpp";
+}
