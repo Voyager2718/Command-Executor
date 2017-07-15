@@ -4,23 +4,26 @@
 #include<list>
 #include<map>
 #include<string>
+
+#include"Result.h"
 #include"IRunnable.h"
-#include"ACommand.h"
 
 using std::list;
 using std::map;
 using std::string;
 
+using std::vector;
+
 class ATransaction : public IRunnable{
 protected:
     string description;
-    list< map< string, string > > values
+    list< map< string, string > > values;
 public:
-    Transaction();
+    ATransaction();
 
-    Transaction(string description);
+    ATransaction(string description);
 
-    virtual void Run(vector<string> params = vector<string>()) = 0;
+    virtual Result Run(vector<string> params = vector<string>()) = 0;
 };
 
-#endifs
+#endif
