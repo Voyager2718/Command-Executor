@@ -27,7 +27,7 @@ Result Command::Run(vector<string> params){
     pipe(fd);
 
     if((pid = fork()) < 0){
-        (Report::GetInstance()).AddReport("[FATAL] FORK-0001: Unable to create new process.", FAILED);
+        (Report::GetInstance()).AddReport("[FATAL] FORK-0001: Unable to create new process. [Command]", FAILED);
         return FAILED;
     }else if(pid == 0){
         close(fd[0]);
@@ -43,13 +43,13 @@ Result Command::Run(vector<string> params){
         execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
         
         if(WEXITSTATUS(status) != 0){   
-            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed.", FAILED);
+            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed. [Command]", FAILED);
             return FAILED;
         }else if(execIsFailed){
-            (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command.", FAILED);
+            (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command. [Command]", FAILED);
             return FAILED;
         }else{
-            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
+            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful. [Command]", SUCCESSFUL);
             return SUCCESSFUL;
         }
     }

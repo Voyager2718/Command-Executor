@@ -5,6 +5,7 @@
 
 #include"ParallelCommand.h"
 #include"ATransaction.h"
+#include"Settings.h"
 
 using std::list;
 using std::map;
@@ -18,5 +19,5 @@ protected:
 public:
     virtual void AddCommand(shared_ptr<ParallelCommand> command);
 
-    virtual void Run(vector<string> params = vector<string>()) override;
+    virtual Result Run(vector<string> params = vector<string>()) override;
 };
