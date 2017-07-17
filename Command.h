@@ -32,7 +32,7 @@ public:
 
     Command(const Command& command) = default;
 
-    virtual Result Run(vector<string> params = vector<string>());
+    virtual Result Run(vector<string> params = vector<string>()) override;
 
     virtual void SetCommand(string command);
 
