@@ -1,5 +1,5 @@
-#include"ParallelCommand.h"
+#include "ParallelCommand.h"
 
-ParallelCommand::ParallelCommand(int timeout, string description) : Command(timeout, description){ }
+ParallelCommand::ParallelCommand(int timeout, string description) : Command(timeout, description) {}
 
-ParallelCommand::ParallelCommand(){ }
+ParallelCommand::ParallelCommand() {}

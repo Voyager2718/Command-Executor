@@ -1,24 +1,31 @@
-#include"Executor.h"
+#include "Executor.h"
 
-void Executor::success(){
+#include<unistd.h>
+
+void Executor::success()
+{
     (Report::GetInstance()).PrintReport();
 }
 
-void Executor::fail(){
+void Executor::fail()
+{
     (Report::GetInstance()).PrintReport();
 }
 
-Executor::Executor(){ }
+Executor::Executor() {}
 
-Executor::Executor(shared_ptr<IRunnable> runnable){
+Executor::Executor(shared_ptr<IRunnable> runnable)
+{
     AddRunnable(runnable);
 }
 
-void Executor::AddRunnable(shared_ptr<IRunnable> runnable){
+void Executor::AddRunnable(shared_ptr<IRunnable> runnable)
+{
     runnables.push_back(runnable);
 }
 
-Result Executor::Execute(){
+Result Executor::Execute()
+{
     return Execute(success, fail);
 }
 
@@ -27,25 +34,31 @@ Result Executor::Execute(){
  * If there's FAILED, stop running following runnables and return FAILED immediately.
  * If all runnables are run successfully, then return SUCCESSFUL.
 */
-Result Executor::Execute(function<void()>succ, function<void()>fl, vector<string> params){
+Result Executor::Execute(function<void()> succ, function<void()> fl, vector<string> params)
+{
     bool haveIgnored = false;
-    for(auto i : runnables){
-        Result result = i->Run(params);
-        if(result == IGNORED){
+    for (auto r : runnables)
+    {
+        Result result = r->Run(params);
+        if (result == IGNORED)
+        {
             haveIgnored = true;
         }
-        if(result == FAILED){
+        if (result == FAILED)
+        {
             fl();
             return FAILED;
         }
     }
     succ();
-    if(haveIgnored){
+    if (haveIgnored)
+    {
         return IGNORED;
     }
     return SUCCESSFUL;
 }
 
-Result Executor::Execute(vector<string> params, function<void()>succ, function<void()>fl){
+Result Executor::Execute(vector<string> params, function<void()> succ, function<void()> fl)
+{
     return Execute(succ, fl, params);
 }

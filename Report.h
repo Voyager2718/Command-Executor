@@ -1,14 +1,14 @@
 #ifndef REPORT_H
 #define REPORT_H
 
-#include<list>
-#include<map>
-#include<string>
-#include<iostream>
-#include<functional>
+#include <list>
+#include <map>
+#include <string>
+#include <iostream>
+#include <functional>
 
-#include"lib/ytime/ytime.h"
-#include"Result.h"
+#include "lib/ytime/ytime.h"
+#include "Result.h"
 
 using std::list;
 using std::map;
@@ -17,27 +17,31 @@ using std::string;
 using std::cout;
 using std::endl;
 
-class Report final{
+class Report final
+{
 private:
-    Report(){}
+  Report() {}
 
-    list< map<string, string> > a;    // map{timestamp, user defined report string}
+  list<map<string, string>> a; // map{timestamp, user defined report string}
 
-    list< map<string, string> > reports;
+  list<map<string, string>> reports;
 
-    static void Printer(string timestamp, string result, string report);
+  static void Printer(string timestamp, string result, string report);
+
 public:
-    static Report& GetInstance();
+  static Report &GetInstance();
 
-    void AddReport(string report, Result result = SUCCESSFUL);
+  Report(const Report &) = delete;
 
-    list< map<string, string> > GetReports();
+  void AddReport(string report, Result result = SUCCESSFUL);
 
-    void PrintReport(function<void(string, string, string)> = Printer);
+  list<map<string, string>> GetReports();
 
-    void PrintSuccessfulReport(function<void(string, string, string)> = Printer);
+  void PrintReport(function<void(string, string, string)> = Printer);
 
-    void PrintFailedReport(function<void(string, string, string)> = Printer);
+  void PrintSuccessfulReport(function<void(string, string, string)> = Printer);
+
+  void PrintFailedReport(function<void(string, string, string)> = Printer);
 };
 
 #endif

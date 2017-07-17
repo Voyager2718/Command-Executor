@@ -1,21 +1,27 @@
-#include"Transaction.h"
+#include "Transaction.h"
 
-void Transaction::AddCommand(shared_ptr<Command> command){
+void Transaction::AddCommand(shared_ptr<Command> command)
+{
     commands.push_back(command);
 }
 
-Result Transaction::Run(vector<string> params){
+Result Transaction::Run(vector<string> params)
+{
     bool haveIgnored = false;
-    for(auto i : commands){
+    for (auto i : commands)
+    {
         Result result = i->Run(params);
-        if(result == IGNORED){
+        if (result == IGNORED)
+        {
             haveIgnored = true;
         }
-        if(result == FAILED){
+        if (result == FAILED)
+        {
             return FAILED;
         }
     }
-    if(haveIgnored){
+    if (haveIgnored)
+    {
         return IGNORED;
     }
     return SUCCESSFUL;
