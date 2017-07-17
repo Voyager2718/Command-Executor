@@ -16,7 +16,7 @@ settings=.
 rmr_outputs=find . -name "*.o" -delete
 
 make: $(main)/main.cpp $(executor)/Executor.o $(command)/Command.o $(irunnable)/IRunnable.h $(report)/Report.o $(result)/Result.o $(ytime)/ytime.o $(transaction)/Transaction.o $(command)/ParallelCommand.o $(transaction)/ParallelTransaction.o $(transaction)/ATransaction.o
-	$(CC) $(command)/Command.o $(command)/ParallelCommand.o $(transaction)/Transaction.o $(transaction)/Transaction.o $(report)/Report.o $(executor)/Executor.o $(result)/Result.o $(ytime)/ytime.o $(transaction)/ATransaction.o $(transaction)/ParallelTransaction.o $(main)/main.cpp -o $(main)/main $(std)
+	$(CC) $(command)/Command.o $(command)/ParallelCommand.o $(transaction)/Transaction.o $(report)/Report.o $(executor)/Executor.o $(result)/Result.o $(ytime)/ytime.o $(transaction)/ATransaction.o $(transaction)/ParallelTransaction.o $(main)/main.cpp -o $(main)/main $(std)
 
 $(report)/Report.o: $(report)/Report.h $(report)/Report.cpp $(ytime)/ytime.o $(result)/Result.o
 	$(CC) -c $(ytime)/ytime.o $(result)/result.o $(report)/Report.cpp -o $(report)/Report.o $(std) -Wno-unused-command-line-argument

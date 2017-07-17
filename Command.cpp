@@ -49,7 +49,7 @@ Result Command::Run(vector<string> params){
             (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command. [Command]", FAILED);
             return FAILED;
         }else{
-            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful.", SUCCESSFUL);
+            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful. [Command]", SUCCESSFUL);
             return SUCCESSFUL;
         }
     }
