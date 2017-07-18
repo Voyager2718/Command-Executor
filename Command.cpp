@@ -42,23 +42,25 @@ Result Command::Run(vector<string> params)
         {
             execStatus = true;
             write(fd[1], &execStatus, sizeof(bool));
+            exit(FAILED);
         }
     }
     else
     {
         wait(&status);
+
         bool execIsFailed = false;
         close(fd[1]);
         execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
 
-        if (WEXITSTATUS(status) != 0)
-        {
-            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed. [Command]", FAILED);
-            return FAILED;
-        }
-        else if (execIsFailed)
+        if (execIsFailed)
         {
             (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command. [Command]", FAILED);
+            return FAILED;
+        }
+        else if (WEXITSTATUS(status) != 0)
+        {
+            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed. [Command]", FAILED);
             return FAILED;
         }
         else

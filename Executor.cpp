@@ -1,7 +1,5 @@
 #include "Executor.h"
 
-#include<unistd.h>
-
 void Executor::success()
 {
     (Report::GetInstance()).PrintReport();

@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+<<<<<<< HEAD
         { 
             "name": "(lldb) Attach",
             "type": "cppdbg",
@@ -9,13 +10,19 @@
             "processId": "${command:pickProcess}",
             "MIMode": "lldb"
         },
+=======
+>>>>>>> develop
         {
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/main",
             "args": [],
+<<<<<<< HEAD
             "stopAtEntry": true,
+=======
+            "stopAtEntry": false,
+>>>>>>> develop
             "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,

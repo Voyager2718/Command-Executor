@@ -9,55 +9,31 @@ Result ParallelTransaction::Run(vector<string> params)
 {
     bool haveIgnored = false;
 
-    pid_t pid;
-    unsigned int numberOfRunningProcess = 0;
-    int status;
+    ThreadPool pool(MAX_THREADS);
+    list<future<Result>> results;
 
-    for (auto c : commands)
+    for (auto command : commands)
     {
-        if ((pid = fork()) < 0)
-        {
-            (Report::GetInstance()).AddReport("[FATAL] FORK-0001: Unable to create new process. [ParallelTransaction]", FAILED);
-            return FAILED;
-        }
-        else if (pid == 0)
-        {
-            exit(c->Run(params));
-        }
-        else
-        {
-            if (++numberOfRunningProcess >= MAX_PROCESS)
-            {
-                int returnValue = wait(&status);
-                Result result = (Result)WEXITSTATUS(returnValue);
-                if (result == IGNORED)
-                {
-                    haveIgnored = true;
-                }
-                if (result == FAILED)
-                {
-                    return FAILED;
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < MAX_PROCESS - 1; i++)
-    {
-        int returnValue = wait(&status);
-        Result result = (Result)WEXITSTATUS(returnValue);
-        if (result == IGNORED)
+        results.push_back(
+            pool.enqueue([command, params] {
+                return command->Run(params);
+            }));
+        /*
+        if (results.back().get() == IGNORED)
         {
             haveIgnored = true;
         }
-        if (result == FAILED)
+        */
+        if (results.back().get() == FAILED)
         {
             return FAILED;
         }
     }
+
     if (haveIgnored)
     {
         return IGNORED;
     }
+
     return SUCCESSFUL;
 }
