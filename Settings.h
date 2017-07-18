@@ -7,6 +7,6 @@
 
 // Specify the target Operating System. Can be either linux or win32 (Not supported yet).
 #define TARGET_OS linux
-#define MAX_PROCESS 4
+#define MAX_THREADS 4
 
 #endif
