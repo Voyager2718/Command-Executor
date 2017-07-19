@@ -1,19 +1,22 @@
-#include"AValidator.h"
-#include<map>
-#include<string>
-#include"Result.h"
+#include "AValidator.h"
+#include <map>
+#include <string>
+#include "Result.h"
 
 using std::map;
 using std::string;
 
-string AValidator::getSuccessDescription(){
+string AValidator::getSuccessDescription()
+{
     return successDescription;
 }
 
-string AValidator::getExceptionDescription(){
+string AValidator::getExceptionDescription()
+{
     return exceptionDescription;
 }
 
-map<string, string> AValidator::getValuesMap(){
+map<string, string> AValidator::getValuesMap()
+{
     return values;
 }

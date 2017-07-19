@@ -21,7 +21,7 @@ Command::Command()
 }
 
 // FIXME: Add IValidator and IOutputChecker.
-Result Command::Run(vector<string> params)
+Result Command::Run(vector<string> arguments)
 {
     pid_t pid;
     int status;
@@ -52,6 +52,7 @@ Result Command::Run(vector<string> params)
         bool execIsFailed = false;
         close(fd[1]);
         execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
+
         if (execIsFailed)
         {
             (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command. [Command]", FAILED);

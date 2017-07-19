@@ -1,9 +1,11 @@
-#include"ATransaction.h"
+#include "ATransaction.h"
 
-ATransaction::ATransaction(string description){
+ATransaction::ATransaction(string description)
+{
     this->description = description;
 }
 
-ATransaction::ATransaction(){
+ATransaction::ATransaction()
+{
     description = "ATransaction.cpp";
 }
