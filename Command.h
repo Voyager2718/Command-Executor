@@ -34,7 +34,7 @@ class Command : public IRunnable
 
     Command(const Command &command) = default;
 
-    virtual Result Run(vector<string> params = vector<string>()) override;
+    virtual Result Run(vector<string> arguments = vector<string>()) override;
 
     virtual void SetCommand(string command);
 

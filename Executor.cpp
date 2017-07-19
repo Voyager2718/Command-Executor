@@ -32,12 +32,12 @@ Result Executor::Execute()
  * If there's FAILED, stop running following runnables and return FAILED immediately.
  * If all runnables are run successfully, then return SUCCESSFUL.
 */
-Result Executor::Execute(function<void()> succ, function<void()> fl, vector<string> params)
+Result Executor::Execute(function<void()> succ, function<void()> fl, vector<string> arguments)
 {
     bool haveIgnored = false;
     for (auto r : runnables)
     {
-        Result result = r->Run(params);
+        Result result = r->Run(arguments);
         if (result == IGNORED)
         {
             haveIgnored = true;
@@ -56,7 +56,7 @@ Result Executor::Execute(function<void()> succ, function<void()> fl, vector<stri
     return SUCCESSFUL;
 }
 
-Result Executor::Execute(vector<string> params, function<void()> succ, function<void()> fl)
+Result Executor::Execute(vector<string> arguments, function<void()> succ, function<void()> fl)
 {
-    return Execute(succ, fl, params);
+    return Execute(succ, fl, arguments);
 }

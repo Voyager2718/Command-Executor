@@ -25,7 +25,7 @@ class ATransaction : public IRunnable
 
     ATransaction(string description);
 
-    virtual Result Run(vector<string> params = vector<string>()) = 0;
+    virtual Result Run(vector<string> arguments = vector<string>()) = 0;
 };
 
 #endif

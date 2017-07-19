@@ -21,7 +21,7 @@ Command::Command()
 }
 
 // FIXME: Add IValidator and IOutputChecker.
-Result Command::Run(vector<string> params)
+Result Command::Run(vector<string> arguments)
 {
     pid_t pid;
     int status;

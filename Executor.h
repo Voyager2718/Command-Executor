@@ -39,8 +39,8 @@ class Executor
 
     virtual Result Execute();
 
-    virtual Result Execute(function<void()> succ, function<void()> fl, vector<string> params = vector<string>());
+    virtual Result Execute(function<void()> succ, function<void()> fl, vector<string> arguments = vector<string>());
 
-    virtual Result Execute(vector<string> params, function<void()> succ = success, function<void()> fl = fail);
+    virtual Result Execute(vector<string> arguments, function<void()> succ = success, function<void()> fl = fail);
 };
 #endif

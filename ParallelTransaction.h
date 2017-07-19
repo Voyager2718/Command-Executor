@@ -28,5 +28,5 @@ protected:
 public:
   virtual void AddCommand(shared_ptr<ParallelCommand> command);
 
-  virtual Result Run(vector<string> params = vector<string>()) override;
+  virtual Result Run(vector<string> arguments = vector<string>()) override;
 };

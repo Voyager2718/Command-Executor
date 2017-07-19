@@ -26,5 +26,5 @@ class Transaction : public ATransaction
   public:
     virtual void AddCommand(shared_ptr<Command> command);
 
-    virtual Result Run(vector<string> params = vector<string>());
+    virtual Result Run(vector<string> arguments = vector<string>());
 };

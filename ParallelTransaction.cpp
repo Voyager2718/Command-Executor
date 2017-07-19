@@ -5,7 +5,7 @@ void ParallelTransaction::AddCommand(shared_ptr<ParallelCommand> command)
     commands.push_back(command);
 }
 
-Result ParallelTransaction::Run(vector<string> params)
+Result ParallelTransaction::Run(vector<string> arguments)
 {
     bool haveIgnored = false;
 
@@ -15,8 +15,8 @@ Result ParallelTransaction::Run(vector<string> params)
     for (auto command : commands)
     {
         results.push_back(
-            pool.enqueue([command, params] {
-                return command->Run(params);
+            pool.enqueue([command, arguments] {
+                return command->Run(arguments);
             }));
         /*
         if (results.back().get() == IGNORED)
