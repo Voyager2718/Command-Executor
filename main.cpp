@@ -17,7 +17,7 @@ using std::make_shared;
 int main(int argc, char *argv[])
 {
     Executor executor;
-    shared_ptr<ParallelTransaction> pTransaction = make_shared<ParallelTransaction>();
+    shared_ptr<Transaction> pTransaction = make_shared<ParallelTransaction>();
 
     pTransaction->AddCommand(make_shared<ParallelCommand>());
     pTransaction->AddCommand(make_shared<ParallelCommand>());
