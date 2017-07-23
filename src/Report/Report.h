@@ -22,9 +22,7 @@ class Report final
 private:
   Report() {}
 
-  list<map<string, string>> a; // map{timestamp, user defined report string}
-
-  list<map<string, string>> reports;
+  list<map<string, string>> reports; // map{timestamp, user defined report string}
 
   static void Printer(string timestamp, string result, string report);
 
