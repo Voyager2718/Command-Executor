@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-#include "Result.h"
+#include "../Result/Result.h"
 
 using std::vector;
 using std::string;

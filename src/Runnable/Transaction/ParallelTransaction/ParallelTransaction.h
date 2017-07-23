@@ -5,12 +5,12 @@
 
 #include <future>
 
-#include "ParallelCommand.h"
-#include "ATransaction.h"
-#include "Settings.h"
+#include "../../Command/ParallelCommand/ParallelCommand.h"
+#include "../ATransaction.h"
+#include "../../../../Settings.h"
 
-#include "lib/ThreadPool/ThreadPool.h"
-#include "Result.h"
+#include "../../../../lib/ThreadPool/ThreadPool.h"
+#include "../../../Result/Result.h"
 
 using std::list;
 using std::map;

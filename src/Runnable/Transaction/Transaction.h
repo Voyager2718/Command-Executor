@@ -6,9 +6,9 @@
 #include <memory>
 #include <functional>
 
-#include "IRunnable.h"
-#include "Command.h"
-#include "Result.h"
+#include "../IRunnable.h"
+#include "../Command/Command.h"
+#include "../../Result/Result.h"
 
 using std::string;
 

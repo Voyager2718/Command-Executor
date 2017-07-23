@@ -5,8 +5,8 @@
 #include <map>
 #include <string>
 
-#include "Result.h"
-#include "IRunnable.h"
+#include "../../Result/Result.h"
+#include "../IRunnable.h"
 
 using std::list;
 using std::map;
