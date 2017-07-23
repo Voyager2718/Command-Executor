@@ -1,14 +1,14 @@
-#ifndef AOUTPUTCHECKER_H
-#define AOUTPUTCHECKER_H
+#ifndef AVALIDATOR_H
+#define AVALIDATOR_H
 
 #include <map>
 #include <string>
-#include "Result.h"
+#include "../Result/Result.h"
 
 using std::map;
 using std::string;
 
-class AOutputChecker
+class AValidator
 {
   protected:
     map<string, string> values;
@@ -17,13 +17,13 @@ class AOutputChecker
     string successDescription;
 
   public:
-    AOutputChecker() = default;
+    AValidator() = default;
 
-    virtual ~AOutputChecker() = default;
+    virtual ~AValidator() = default;
 
-    AOutputChecker(const AOutputChecker &outputChecker) = default;
+    AValidator(const AValidator &validator) = default;
 
-    virtual Result Check(); // FIXME: Put output into check or use another mechanism?
+    virtual Result Verify() = 0;
 
     virtual string getSuccessDescription();
 

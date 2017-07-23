@@ -1,11 +1,11 @@
 #include <iostream>
 #include <memory>
 
-#include "Executor.h"
-#include "Command.h"
-#include "IRunnable.h"
-#include "ParallelTransaction.h"
-#include "ParallelCommand.h"
+#include "src/Executor/Executor.h"
+#include "src/Runnable/Command/Command.h"
+#include "src/Runnable/IRunnable.h"
+#include "src/Runnable/Transaction/ParallelTransaction/ParallelTransaction.h"
+#include "src/Runnable/Command/ParallelCommand/ParallelCommand.h"
 
 using std::cout;
 using std::cin;

@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-#include "Result.h"
+#include "../Result/Result.h"
 
 using std::vector;
 using std::string;
@@ -14,7 +14,7 @@ using std::function;
 
 class IRunnable
 {
-  public:
+public:
     virtual Result Run(vector<string> arguments = vector<string>()) = 0;
 };
 

@@ -23,7 +23,7 @@ For those who don't want to modify C++ codes, you can use YCE file to integrate 
 
 YCE(YCE Command Executor) file describes command/program location, what kind of arguments should be pass to it, how to execute, what kind of OutputChecker/Validator should be used.
 
-YCE will be interpret by Launcher and call Executor to do concrete tasks.
+YCE will be interpreted by Launcher and call Executor to do concrete tasks.
 
 Example of YCE file:
 ```
@@ -46,7 +46,7 @@ serial:
 # Comments
 ```
 
-You can put yce file reference is both parallel and serial part. However, as YCE file can contains both parallel and serial tasks, if you want to put yce file reference in parallel part, you MUST insure that there's no serial tasks in referenced yce file.
+You can put yce file reference in both parallel and serial part. However, as YCE file can contains both parallel and serial tasks, if you want to put yce file reference in parallel part, you MUST insure that there's no serial tasks in referenced YCE file.
 
 # Components
 ## Settings
@@ -66,7 +66,7 @@ File name: **Command.h**
 |`Command(int timeout, string description)`|`int timeout`: Timeout of command execution. <br />`string description`: Description.|None|Constructor.|
 |`virtual ~Command()`|None|None|Destructor.|
 |`Command(const Command& command)`|`const Command& command`: Object to be copied.|None|Copy constructor.|
-|`virtual Result Run(vector<string> arguments = vector<string>())`|`vector<string>`: Arguments vector|`Result`: Result of command execution, defined in **Result.h**|This method implements `IRunnable::Run`.|
+|`virtual Result Run(vector<string> arguments = vector<string>())`|`vector<string>`: Arguments vector|`Result`: Result of command execution, defined in **Result.h**|This method implements `IRunnable::Run` and it will run command.|
 |`virtual void SetCommand(string command)`|`string command`: Command that need to be run.|void|Add command that need to be run.|
 |`virtual string GetCommand()`|void|`string`: Command that added to this class.|Return command that added to this class.|
 |`virtual void SetTimeout(int timeout)`|`int timeout`: Timeout of command execution.|void|Command process will be terminated when exceeded timeout.|
@@ -85,15 +85,25 @@ File name: **Transaction.h**
 
 `Transaction` can hold multiple `Command`s (`Command`, `ParallelCommand` and classes inherit from these 2 classes are acceptable) and will run each command in seria    l mode. `Transaction` enables shared space for `Command`s.
 
+|Methods|Arguments|Return Value|Comments|
+|-------|---------|------------|--------|
+|`virtual void AddCommand(shared_ptr<Command> command)`|`shared_ptr<Command> command`: Command that needs to be run.|void|Add command that needs to be run by Transaction.|
+|`virtual Result Run(vector<string> arguments = vector<string>())`|`vector<string> arguments = vector<string>()`: Argument for the first command.|`Result`: Result of execution, defined in **Result.h**.|This method implements `IRunnable::Run` and it will run commands in *serial* mode.|
+
 ## ParallelTransaction
 File name: **ParallelTransaction.h**
 
 `ParallelTransaction` can only hold `ParallelCommand` or classes inherit from `ParallelCommand`. `ParallelCommand`s in `ParallelTransaction` will be run in multiple threads. The number of threads depends on `MAX_THREADS` defined in **Settings.h**.
 
+|Methods|Arguments|Return Value|Comments|
+|-------|---------|------------|--------|
+|`virtual void AddCommand(shared_ptr<ParallelCommand> command)`|`shared_ptr<ParallelCommand> command`: Command that needs to be run.|void|Add command that needs to be run by Transaction.|
+|`virtual Result Run(vector<string> arguments = vector<string>())`|`vector<string> arguments = vector<string>()`: Argument for the first command.|`Result`: Result of execution, defined in **Result.h**.|This method overrides `Transaction::Run` and it will run commands in *parallel* mode.|
+
 ## Executor
 File name: **Executor.h**
 
-`Executor` executes classes implements `IRunnable` using virtual method `Result Run(vector<string> arguments = vector<string>())`. `Command`, `ParallelCommand`, `Transaction`, `ParallelTransaction` can be added to `Executor`. `IRunnables` in `Executor` will be executed in serial mode.
+`Executor` executes classes implements `IRunnable` using virtual method `Result Run(vector<string> arguments = vector<string>())`. `Command`, `ParallelCommand`, `Transaction`, `ParallelTransaction` can be added to `Executor`. `IRunnable`s in `Executor` will be executed in serial mode.
 
 ## Launcher [Future feature]
 Launcher defines several interfaces to launch appropriate tasks. Also, Launcher takes the responsibility of YCE file interpretation.
@@ -104,6 +114,8 @@ What's more, Launcher will have daemons listen to certain ports so that it can r
 File name: **Report.h**
 
 `Report` is a Singleton class which means you can always use `Report::GetInstance())` to get Report instance and do your operations. Reminder, Report should be used in main process or you will need to sync data yourself.
+
+This class CANNOT be inherited.
 
 ## Result
 `Result` is an enum which defines three result status `SUCCESSFUL`, `FAILED` and `IGNORED`. `IGNORED` means that during execution, one or more failures were hit, but ALL of them can be ignored.

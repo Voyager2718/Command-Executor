@@ -4,9 +4,9 @@
 #include <vector>
 #include <string>
 
-#include "Command.h"
-#include "IRunnable.h"
-#include "Result.h"
+#include "../Command.h"
+#include "../../IRunnable.h"
+#include "../../../Result/Result.h"
 
 using std::vector;
 using std::string;

@@ -6,10 +6,10 @@
 #include <unistd.h>
 #include <memory>
 
-#include "Report.h"
-#include "IRunnable.h"
-#include "AValidator.h"
-#include "AOutputChecker.h"
+#include "../../Report/Report.h"
+#include "../IRunnable.h"
+#include "../../Validator/AValidator.h"
+#include "../../OutputChecker/AOutputChecker.h"
 
 using std::list;
 using std::string;
