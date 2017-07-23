@@ -69,6 +69,7 @@ Result Command::Run(vector<string> arguments)
             return SUCCESSFUL;
         }
     }
+    return FAILED;
 }
 
 void Command::SetCommand(string command)

@@ -1,8 +1,17 @@
 {
     "version": "0.2.0",
     "configurations": [
-<<<<<<< HEAD
-        { 
+        {
+            "name": "Attach (Remote Debug)",
+            "type": "python",
+            "request": "attach",
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "${workspaceRoot}",
+            "port": 3000,
+            "secret": "my_secret",
+            "host": "localhost"
+        },
+        {
             "name": "(lldb) Attach",
             "type": "cppdbg",
             "request": "attach",
@@ -10,19 +19,13 @@
             "processId": "${command:pickProcess}",
             "MIMode": "lldb"
         },
-=======
->>>>>>> develop
         {
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/main",
             "args": [],
-<<<<<<< HEAD
             "stopAtEntry": true,
-=======
-            "stopAtEntry": false,
->>>>>>> develop
             "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,

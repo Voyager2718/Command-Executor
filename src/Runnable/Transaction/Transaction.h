@@ -6,9 +6,9 @@
 #include <memory>
 #include <functional>
 
-#include "IRunnable.h"
-#include "Command.h"
-#include "Result.h"
+#include "../IRunnable.h"
+#include "../Command/Command.h"
+#include "../../Result/Result.h"
 
 using std::string;
 
@@ -20,10 +20,10 @@ using std::function;
 
 class Transaction : public ATransaction
 {
-  protected:
+protected:
     list<shared_ptr<Command>> commands;
 
-  public:
+public:
     virtual void AddCommand(shared_ptr<Command> command);
 
     virtual Result Run(vector<string> arguments = vector<string>());

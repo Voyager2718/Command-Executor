@@ -7,8 +7,8 @@
 #include <iostream>
 #include <functional>
 
-#include "lib/ytime/ytime.h"
-#include "Result.h"
+#include "../../lib/ytime/ytime.h"
+#include "../Result/Result.h"
 
 using std::list;
 using std::map;

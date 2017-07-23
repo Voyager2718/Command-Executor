@@ -6,9 +6,9 @@
 #include <functional>
 #include <memory>
 
-#include "Result.h"
-#include "IRunnable.h"
-#include "Report.h"
+#include "../Result/Result.h"
+#include "../Runnable/IRunnable.h"
+#include "../Report/Report.h"
 
 using std::list;
 using std::vector;
