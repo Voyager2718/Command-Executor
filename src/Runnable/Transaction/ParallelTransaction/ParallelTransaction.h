@@ -23,8 +23,10 @@ using std::future;
 class ParallelTransaction : public ATransaction
 {
 protected:
-  list<shared_ptr<ParallelCommand>> commands;
+    list<shared_ptr<ParallelCommand>> commands;
 
 public:
-  virtual Result Run(vector<string> arguments = vector<string>()) override;
+    virtual void AddCommand(shared_ptr<ParallelCommand> command);
+
+    virtual Result Run(vector<string> arguments = vector<string>()) override;
 };

@@ -17,7 +17,7 @@ settings=.
 
 rmr_outputs=find . -name "*.o" -delete
 
-main_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o
+main_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o
 
 make: $(main)/main.cpp $(runnable)/IRunnable.h $(main_dep)
 	$(CC) $(main_dep) $(main)/main.cpp -o $(main)/main $(opt)
