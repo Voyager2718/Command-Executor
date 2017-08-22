@@ -42,6 +42,17 @@ serial{
     };
 }
 
+YCE file v0.0.1 supports following lexical rules:
+- 1. key:integer;
+    - 1.1. key:string;
+- 2. program("PATH");
+    - 2.1. program("PATH"){ programs };
+- 3. running_mode{};
+- 4. variable=integer;
+    - 4.1. variable=string;
+- 5. #comments\n
+    - 5.1. #comments\r\n
+
 # Comments
 ```
 
