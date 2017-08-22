@@ -25,23 +25,22 @@ YCE(YCE Command Executor) file describes command/program location, what kind of 
 
 YCE will be interpreted by Launcher and call Executor to do concrete tasks.
 
-Example of YCE file:
+Example of YCE file (v 0.0.1):
 ```
-#Version0001
-parallel:
-    command: "~/Documents/p_program1";
-    command: "~/Documents/p_program2"{
-        validator: "~/Documents/validator";
-        checker: "~/Documents/checker";
+Version:0001
+parallel{
+    command("~/Documents/p_program1");
+    command("~/Documents/p_program2"){
+        validator("~/Documents/validator");
+        checker("~/Documents/checker");
     };
-    yce: "~/Documents/p_yce_task.yce";
-serial:
-    command: "~/Documents/s_program1";
-    command: "~/Documents/s_program2"{
-        validator: "~/Documents/validator";
-        checker: "~/Documents/checker";
+serial{
+    command("~/Documents/s_program1";
+    command("~/Documents/s_program2"){
+        validator("~/Documents/validator");
+        checker("~/Documents/checker");
     };
-    yce: "~/Documents/s_yce_task.yce";
+}
 
 # Comments
 ```
