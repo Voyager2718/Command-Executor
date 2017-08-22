@@ -41,6 +41,9 @@ serial{
         checker("~/Documents/checker");
     };
 }
+# Comments
+```
+
 
 YCE file v0.0.1 supports following lexical rules:
 - 1. key:integer;
@@ -52,9 +55,6 @@ YCE file v0.0.1 supports following lexical rules:
     - 4.1. variable=string;
 - 5. #comments\n
     - 5.1. #comments\r\n
-
-# Comments
-```
 
 You can put yce file reference in both parallel and serial part. However, as YCE file can contains both parallel and serial tasks, if you want to put yce file reference in parallel part, you MUST insure that there's no serial tasks in referenced YCE file.
 
