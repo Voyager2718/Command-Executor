@@ -46,15 +46,15 @@ serial{
 
 
 YCE file v0.0.1 supports following lexical rules:
-- 1. key:integer;
-    - 1.1. key:string;
-- 2. program("PATH");
-    - 2.1. program("PATH"){ programs };
-- 3. running_mode{};
-- 4. variable=integer;
-    - 4.1. variable=string;
-- 5. #comments\n
-    - 5.1. #comments\r\n
+- key:integer;
+    - key:string;
+- program("PATH");
+    - program("PATH"){ programs };
+- running_mode{};
+- variable=integer;
+    - variable=string;
+- #comments\n
+    - #comments\r\n
 
 You can put yce file reference in both parallel and serial part. However, as YCE file can contains both parallel and serial tasks, if you want to put yce file reference in parallel part, you MUST insure that there's no serial tasks in referenced YCE file.
 
