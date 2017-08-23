@@ -1,10 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <map>
+#include <tuple>
 #include <regex>
 
-using std::map;
+using std::tuple;
+using std::make_tuple;
+using std::get;
 using std::vector;
 using std::cout;
 using std::cin;
@@ -32,17 +34,9 @@ class YCETokenizer
 
     string sourceCode;
 
-    vector<map<string, string>> tokens;
+    vector<tuple<string, string>> tokens;
 
-    vector<map<string, string>> candidateTokens;
-
-    map<string, string> MakeMap(string key, string value)
-    {
-        map<string, string> temp;
-        temp["keyword"] = key;
-        temp["value"] = value;
-        return temp;
-    }
+    vector<tuple<string, string>> candidateTokens;
 
     bool IsAcceptableKeyword(string test)
     {
@@ -165,7 +159,7 @@ class YCETokenizer
         int i = 0;
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
-            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + 1, 1);
+            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
             if (endChar == ":" || endChar == " ")
             {
                 break;
@@ -177,10 +171,10 @@ class YCETokenizer
             return false; // No key specified.
         }
         string key = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        maybeTokenizedPosition += i;
         if (IsAcceptableKeyword(key))
         {
-            maybeTokenizedPosition += 1;
-            candidateTokens.push_back(MakeMap("key", key));
+            candidateTokens.push_back(make_tuple("key", key));
             return true;
         }
         return false;
@@ -191,7 +185,7 @@ class YCETokenizer
         if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == ":")
         {
             maybeTokenizedPosition += 1;
-            candidateTokens.push_back(MakeMap("colon", ":"));
+            candidateTokens.push_back(make_tuple("colon", ":"));
             return true;
         }
         return false;
@@ -202,7 +196,7 @@ class YCETokenizer
         if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == ";")
         {
             maybeTokenizedPosition += 1;
-            candidateTokens.push_back(MakeMap("terminator", ";"));
+            candidateTokens.push_back(make_tuple("terminator", ";"));
             return true;
         }
         return false;
@@ -213,7 +207,7 @@ class YCETokenizer
         int i = 0;
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
-            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + 1, 1);
+            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
             if (endChar == ";" || endChar == " ")
             {
                 break;
@@ -228,7 +222,7 @@ class YCETokenizer
         if (IsInteger(i_value))
         {
             maybeTokenizedPosition += i;
-            candidateTokens.push_back(MakeMap("i_value", i_value));
+            candidateTokens.push_back(make_tuple("i_value", i_value));
             return true;
         }
         return false;
@@ -261,7 +255,7 @@ class YCETokenizer
         }
         i += 1;
         maybeTokenizedPosition += i;
-        candidateTokens.push_back(MakeMap("s_value", s_value));
+        candidateTokens.push_back(make_tuple("s_value", s_value));
         return true;
     }
 
@@ -299,6 +293,11 @@ class YCETokenizer
 
             if (TerminatorTokenizer())
             {
+                tokenizedPosition += maybeTokenizedPosition;
+                maybeTokenizedPosition = 0;
+                tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                candidateTokens.clear();
+
                 return true;
             }
             return false;
@@ -315,9 +314,13 @@ class YCETokenizer
 
             if (TerminatorTokenizer())
             {
+                tokenizedPosition += maybeTokenizedPosition;
+                maybeTokenizedPosition = 0;
+                tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                candidateTokens.clear();
+
                 return true;
             }
-
             return false;
         }
         return false;
@@ -375,7 +378,7 @@ class YCETokenizer
         return true;
     }
 
-    vector<map<string, string>> GetTokens()
+    vector<tuple<string, string>> GetTokens()
     {
         return tokens;
     }
@@ -383,12 +386,14 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:12345;\n# Comments ");
+    YCETokenizer tokenizer("version:12345;\n# Comments\nversion2:67890;");
 
-    vector<map<string, string>> tokens = tokenizer.GetTokens();
+    tokenizer.Parse();
+
+    vector<tuple<string, string>> tokens = tokenizer.GetTokens();
 
     for (auto t : tokens)
     {
-        cout<<t[""]
+        cout << get<0>(t) + " -> " + get<1>(t) << endl;
     }
 }
