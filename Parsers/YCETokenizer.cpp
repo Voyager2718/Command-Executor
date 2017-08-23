@@ -103,11 +103,11 @@ class YCETokenizer
         {
             if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 2) == "\r\n")
             {
-                maybeTokenizedPosition += 2;
+                tokenizedPosition += 2;
             }
             else if ((sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "\n"))
             {
-                maybeTokenizedPosition += 1;
+                tokenizedPosition += 1;
             }
             else
             {
