@@ -89,7 +89,8 @@ class YCETokenizer
     {
         while (1)
         {
-            if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == " ")
+            string next = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1);
+            if (next == " " || next == "\t")
             {
                 maybeTokenizedPosition++;
             }
@@ -219,13 +220,13 @@ class YCETokenizer
         }
         if (i == 0)
         {
-            return false; // No i_value specified.
+            return false; // No i_const specified.
         }
-        string i_value = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
-        if (IsInteger(i_value))
+        string i_const = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        if (IsInteger(i_const))
         {
             maybeTokenizedPosition += i;
-            candidateTokens.push_back(make_tuple("i_value", i_value));
+            candidateTokens.push_back(make_tuple("i_const", i_const));
             return true;
         }
         return false;
@@ -472,7 +473,7 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:12345;\nversion2: \"Test\";version3:67890;serial{  };BadTest: \"BadValue;#Comments\n");
+    YCETokenizer tokenizer("version:\t12345;\nversion2: \"Test\";version3:67890;serial {  };BadTest: \"BadValue;#Comments\n");
 
     tokenizer.Tokenize();
 
