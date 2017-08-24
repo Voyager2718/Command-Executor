@@ -26,7 +26,6 @@ class YCETokenizer
         VARIABLE,
         I_VALUE,
         S_VALUE,
-        COMMENT
     };
     STATE state;
 
@@ -40,6 +39,17 @@ class YCETokenizer
     vector<tuple<string, string>> candidateTokens;
 
     bool tokenizeSuccessful = false;
+
+    void Reset()
+    {
+        sourceCode = "";
+        state = NORMAL;
+        tokenizedPosition = 0;
+        maybeTokenizedPosition = 0;
+        tokens.clear();
+        candidateTokens.clear();
+        tokenizeSuccessful = false;
+    }
 
     bool IsAcceptableKeyword(string test)
     {
@@ -130,6 +140,7 @@ class YCETokenizer
         return false;
     }
 
+    /* Put comment tokenization into preprocessor. So this method is obsolete. Keep this is because it might be useful later.
     void CommentTokenizer()
     {
         while (1)
@@ -157,6 +168,7 @@ class YCETokenizer
             tokenizedPosition += 1;
         }
     }
+    */
 
     bool KeyTokenizer()
     {
@@ -212,7 +224,7 @@ class YCETokenizer
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
             string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
-            if (endChar == ";" || endChar == " ")
+            if (endChar == ";" || endChar == " " || endChar == "\t")
             {
                 break;
             }
@@ -358,7 +370,7 @@ class YCETokenizer
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
             string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
-            if (endChar == "{" || endChar == " ")
+            if (endChar == "{" || endChar == " " || endChar == "\t")
             {
                 break;
             }
@@ -378,6 +390,46 @@ class YCETokenizer
         return false;
     }
 
+    void Preprocess()
+    {
+        string preprocessedSourceCode = "";
+
+        bool inCommentArea = false;
+
+        for (int i = 0; i < sourceCode.size(); i++)
+        {
+            string next = sourceCode.substr(i, 1);
+            if (next == "#" && !inCommentArea)
+            {
+                inCommentArea = true;
+                continue;
+            }
+            if (inCommentArea && next == "\n")
+            {
+                inCommentArea = false;
+                continue;
+            }
+            if (inCommentArea && next == "\r")
+            {
+                if (IsEndOfFile(1))
+                {
+                    continue;
+                }
+                if (sourceCode.substr(i + 1, 1) == "\n")
+                {
+                    inCommentArea = false;
+                    continue;
+                }
+                continue;
+            }
+            if (!inCommentArea)
+            {
+                preprocessedSourceCode += next;
+            }
+        }
+        sourceCode = preprocessedSourceCode;
+    }
+
   public:
     YCETokenizer(string sourceCode)
     {
@@ -386,8 +438,20 @@ class YCETokenizer
 
     YCETokenizer() {}
 
+    void SetSourceCode(string sourceCode)
+    {
+        this->sourceCode = sourceCode;
+    }
+
+    bool GetTokenizationResult()
+    {
+        return tokenizeSuccessful;
+    }
+
     bool Tokenize()
     {
+        Preprocess();
+
         state = NORMAL;
         tokenizedPosition = 0;
         maybeTokenizedPosition = 0;
@@ -413,22 +477,17 @@ class YCETokenizer
                     }
                     else
                     {
+                        tokenizeSuccessful = false;
+                        Reset();
                         return false;
                     }
                 }
-                else if (HashSignTokenizer()) //Hash sign tokenizer should always be the last option.
-                {
-                    state = COMMENT;
-                    break;
-                }
                 else
                 {
+                    tokenizeSuccessful = false;
+                    Reset();
                     return false;
                 }
-                break;
-            case COMMENT:
-                CommentTokenizer();
-                state = NORMAL;
                 break;
             case RUNNING_MODE: // Fix me: Ignored concrete programs tokenizer.
                 SpaceTokenizer();
@@ -448,8 +507,10 @@ class YCETokenizer
 
                         break;
                     }
+                    Reset();
                     return false;
                 }
+                Reset();
                 return false;
                 break;
             case KEY:
@@ -462,6 +523,7 @@ class YCETokenizer
                 break;
             }
         }
+        tokenizeSuccessful = true;
         return true;
     }
 
@@ -473,14 +535,19 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:\t12345;\nversion2: \"Test\";version3:67890;serial {  };BadTest: \"BadValue;#Comments\n");
+    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t {  };BadTest: \"BadValue\";#Comments\n");
 
-    tokenizer.Tokenize();
-
-    vector<tuple<string, string>> tokens = tokenizer.GetTokens();
-
-    for (auto t : tokens)
+    if (tokenizer.Tokenize())
     {
-        cout << get<0>(t) + " -> " + get<1>(t) << endl;
+        vector<tuple<string, string>> tokens = tokenizer.GetTokens();
+
+        for (auto t : tokens)
+        {
+            cout << get<0>(t) + " -> " + get<1>(t) << endl;
+        }
+    }
+    else
+    {
+        cout << "Lexical error." << endl;
     }
 }
