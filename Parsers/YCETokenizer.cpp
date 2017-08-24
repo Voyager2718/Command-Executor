@@ -22,21 +22,34 @@ class YCETokenizer
     {
         NORMAL,
         KEY,
+        RUNNING_MODE,
         VARIABLE,
         I_VALUE,
         S_VALUE,
-        COMMENT
     };
     STATE state;
 
-    int tokenizedPosition; // Intepreted code position.
-    int maybeTokenizedPosition;
+    int tokenizedPosition;      // Intepreted code position.
+    int maybeTokenizedPosition; // Maybe interpreted code position. Will be removed if tokenization failed.
 
     string sourceCode;
 
     vector<tuple<string, string>> tokens;
 
     vector<tuple<string, string>> candidateTokens;
+
+    bool tokenizeSuccessful = false;
+
+    void Reset()
+    {
+        sourceCode = "";
+        state = NORMAL;
+        tokenizedPosition = 0;
+        maybeTokenizedPosition = 0;
+        tokens.clear();
+        candidateTokens.clear();
+        tokenizeSuccessful = false;
+    }
 
     bool IsAcceptableKeyword(string test)
     {
@@ -86,7 +99,8 @@ class YCETokenizer
     {
         while (1)
         {
-            if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == " ")
+            string next = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1);
+            if (next == " " || next == "\t")
             {
                 maybeTokenizedPosition++;
             }
@@ -126,6 +140,7 @@ class YCETokenizer
         return false;
     }
 
+    /* Put comment tokenization into preprocessor. So this method is obsolete. Keep this is because it might be useful later.
     void CommentTokenizer()
     {
         while (1)
@@ -153,6 +168,7 @@ class YCETokenizer
             tokenizedPosition += 1;
         }
     }
+    */
 
     bool KeyTokenizer()
     {
@@ -208,7 +224,7 @@ class YCETokenizer
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
             string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
-            if (endChar == ";" || endChar == " ")
+            if (endChar == ";" || endChar == " " || endChar == "\t")
             {
                 break;
             }
@@ -216,13 +232,13 @@ class YCETokenizer
         }
         if (i == 0)
         {
-            return false; // No i_value specified.
+            return false; // No i_const specified.
         }
-        string i_value = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
-        if (IsInteger(i_value))
+        string i_const = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        if (IsInteger(i_const))
         {
             maybeTokenizedPosition += i;
-            candidateTokens.push_back(make_tuple("i_value", i_value));
+            candidateTokens.push_back(make_tuple("i_const", i_const));
             return true;
         }
         return false;
@@ -326,6 +342,94 @@ class YCETokenizer
         return false;
     }
 
+    bool LeftBraceSignTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "{")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("left_brace", "{"));
+            return true;
+        }
+        return false;
+    }
+
+    bool RightBraceSignTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "}")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("right_brace", "}"));
+            return true;
+        }
+        return false;
+    }
+
+    bool RunningModeKeyTokenizer()
+    {
+        int i = 0;
+        while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
+        {
+            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
+            if (endChar == "{" || endChar == " " || endChar == "\t")
+            {
+                break;
+            }
+            i++;
+        }
+        if (i == 0)
+        {
+            return false; // No key specified.
+        }
+        string key = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        maybeTokenizedPosition += i;
+        if (IsAcceptableKeyword(key))
+        {
+            candidateTokens.push_back(make_tuple("running_mode", key));
+            return true;
+        }
+        return false;
+    }
+
+    void Preprocess()
+    {
+        string preprocessedSourceCode = "";
+
+        bool inCommentArea = false;
+
+        for (int i = 0; i < sourceCode.size(); i++)
+        {
+            string next = sourceCode.substr(i, 1);
+            if (next == "#" && !inCommentArea)
+            {
+                inCommentArea = true;
+                continue;
+            }
+            if (inCommentArea && next == "\n")
+            {
+                inCommentArea = false;
+                continue;
+            }
+            if (inCommentArea && next == "\r")
+            {
+                if (IsEndOfFile(1))
+                {
+                    continue;
+                }
+                if (sourceCode.substr(i + 1, 1) == "\n")
+                {
+                    inCommentArea = false;
+                    continue;
+                }
+                continue;
+            }
+            if (!inCommentArea)
+            {
+                preprocessedSourceCode += next;
+            }
+        }
+        sourceCode = preprocessedSourceCode;
+    }
+
   public:
     YCETokenizer(string sourceCode)
     {
@@ -334,8 +438,20 @@ class YCETokenizer
 
     YCETokenizer() {}
 
-    bool Parse()
+    void SetSourceCode(string sourceCode)
     {
+        this->sourceCode = sourceCode;
+    }
+
+    bool GetTokenizationResult()
+    {
+        return tokenizeSuccessful;
+    }
+
+    bool Tokenize()
+    {
+        Preprocess();
+
         state = NORMAL;
         tokenizedPosition = 0;
         maybeTokenizedPosition = 0;
@@ -351,19 +467,51 @@ class YCETokenizer
                 {
                     break;
                 }
-                else if (HashSignTokenizer())
+                else if (RunningModeKeyTokenizer())
                 {
-                    state = COMMENT;
-                    break;
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (LeftBraceSignTokenizer())
+                    {
+                        state = RUNNING_MODE;
+                    }
+                    else
+                    {
+                        tokenizeSuccessful = false;
+                        Reset();
+                        return false;
+                    }
                 }
                 else
                 {
+                    tokenizeSuccessful = false;
+                    Reset();
                     return false;
                 }
                 break;
-            case COMMENT:
-                CommentTokenizer();
-                state = NORMAL;
+            case RUNNING_MODE: // Fix me: Ignored concrete programs tokenizer.
+                SpaceTokenizer();
+                EnterTokenizer();
+                if (RightBraceSignTokenizer())
+                {
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (TerminatorTokenizer())
+                    {
+                        state = NORMAL;
+
+                        tokenizedPosition += maybeTokenizedPosition;
+                        maybeTokenizedPosition = 0;
+                        tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                        candidateTokens.clear();
+
+                        break;
+                    }
+                    Reset();
+                    return false;
+                }
+                Reset();
+                return false;
                 break;
             case KEY:
                 break;
@@ -375,6 +523,7 @@ class YCETokenizer
                 break;
             }
         }
+        tokenizeSuccessful = true;
         return true;
     }
 
@@ -386,14 +535,19 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:12345;\n# Comments\nversion2:67890;");
+    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t {  };BadTest: \"BadValue\";#Comments\n");
 
-    tokenizer.Parse();
-
-    vector<tuple<string, string>> tokens = tokenizer.GetTokens();
-
-    for (auto t : tokens)
+    if (tokenizer.Tokenize())
     {
-        cout << get<0>(t) + " -> " + get<1>(t) << endl;
+        vector<tuple<string, string>> tokens = tokenizer.GetTokens();
+
+        for (auto t : tokens)
+        {
+            cout << get<0>(t) + " -> " + get<1>(t) << endl;
+        }
+    }
+    else
+    {
+        cout << "Lexical error." << endl;
     }
 }
