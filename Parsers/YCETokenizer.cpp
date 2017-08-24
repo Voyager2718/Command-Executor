@@ -22,6 +22,7 @@ class YCETokenizer
     {
         NORMAL,
         KEY,
+        RUNNING_MODE,
         VARIABLE,
         I_VALUE,
         S_VALUE,
@@ -29,14 +30,16 @@ class YCETokenizer
     };
     STATE state;
 
-    int tokenizedPosition; // Intepreted code position.
-    int maybeTokenizedPosition;
+    int tokenizedPosition;      // Intepreted code position.
+    int maybeTokenizedPosition; // Maybe interpreted code position. Will be removed if tokenization failed.
 
     string sourceCode;
 
     vector<tuple<string, string>> tokens;
 
     vector<tuple<string, string>> candidateTokens;
+
+    bool tokenizeSuccessful = false;
 
     bool IsAcceptableKeyword(string test)
     {
@@ -326,6 +329,54 @@ class YCETokenizer
         return false;
     }
 
+    bool LeftBraceSignTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "{")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("left_brace", "{"));
+            return true;
+        }
+        return false;
+    }
+
+    bool RightBraceSignTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "}")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("right_brace", "}"));
+            return true;
+        }
+        return false;
+    }
+
+    bool RunningModeKeyTokenizer()
+    {
+        int i = 0;
+        while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
+        {
+            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
+            if (endChar == "{" || endChar == " ")
+            {
+                break;
+            }
+            i++;
+        }
+        if (i == 0)
+        {
+            return false; // No key specified.
+        }
+        string key = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        maybeTokenizedPosition += i;
+        if (IsAcceptableKeyword(key))
+        {
+            candidateTokens.push_back(make_tuple("running_mode", key));
+            return true;
+        }
+        return false;
+    }
+
   public:
     YCETokenizer(string sourceCode)
     {
@@ -334,7 +385,7 @@ class YCETokenizer
 
     YCETokenizer() {}
 
-    bool Parse()
+    bool Tokenize()
     {
         state = NORMAL;
         tokenizedPosition = 0;
@@ -351,7 +402,20 @@ class YCETokenizer
                 {
                     break;
                 }
-                else if (HashSignTokenizer())
+                else if (RunningModeKeyTokenizer())
+                {
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (LeftBraceSignTokenizer())
+                    {
+                        state = RUNNING_MODE;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (HashSignTokenizer()) //Hash sign tokenizer should always be the last option.
                 {
                     state = COMMENT;
                     break;
@@ -364,6 +428,28 @@ class YCETokenizer
             case COMMENT:
                 CommentTokenizer();
                 state = NORMAL;
+                break;
+            case RUNNING_MODE: // Fix me: Ignored concrete programs tokenizer.
+                SpaceTokenizer();
+                EnterTokenizer();
+                if (RightBraceSignTokenizer())
+                {
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (TerminatorTokenizer())
+                    {
+                        state = NORMAL;
+
+                        tokenizedPosition += maybeTokenizedPosition;
+                        maybeTokenizedPosition = 0;
+                        tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                        candidateTokens.clear();
+
+                        break;
+                    }
+                    return false;
+                }
+                return false;
                 break;
             case KEY:
                 break;
@@ -386,9 +472,9 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:12345;\n# Comments\nversion2:67890;");
+    YCETokenizer tokenizer("version:12345;\nversion2: \"Test\";version3:67890;serial{  };BadTest: \"BadValue;#Comments\n");
 
-    tokenizer.Parse();
+    tokenizer.Tokenize();
 
     vector<tuple<string, string>> tokens = tokenizer.GetTokens();
 
