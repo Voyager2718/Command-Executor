@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 #include <regex>
+#include <algorithm>
 
 using std::tuple;
 using std::make_tuple;
@@ -21,11 +22,8 @@ class YCETokenizer
     enum STATE
     {
         NORMAL,
-        KEY,
         RUNNING_MODE,
-        VARIABLE,
-        I_VALUE,
-        S_VALUE,
+        PROGRAM
     };
     STATE state;
 
@@ -170,13 +168,13 @@ class YCETokenizer
     }
     */
 
-    bool KeyTokenizer()
+    bool KeyTokenizer(string tokenType = "constant")
     {
         int i = 0;
         while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
         {
             string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
-            if (endChar == ":" || endChar == " ")
+            if (endChar == ":" || endChar == " " || endChar == "=" || endChar == "\t")
             {
                 break;
             }
@@ -190,7 +188,7 @@ class YCETokenizer
         maybeTokenizedPosition += i;
         if (IsAcceptableKeyword(key))
         {
-            candidateTokens.push_back(make_tuple("key", key));
+            candidateTokens.push_back(make_tuple(tokenType, key));
             return true;
         }
         return false;
@@ -202,6 +200,17 @@ class YCETokenizer
         {
             maybeTokenizedPosition += 1;
             candidateTokens.push_back(make_tuple("colon", ":"));
+            return true;
+        }
+        return false;
+    }
+
+    bool EqualSignTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "=")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("equal", "="));
             return true;
         }
         return false;
@@ -238,7 +247,7 @@ class YCETokenizer
         if (IsInteger(i_const))
         {
             maybeTokenizedPosition += i;
-            candidateTokens.push_back(make_tuple("i_const", i_const));
+            candidateTokens.push_back(make_tuple("i_value", i_const));
             return true;
         }
         return false;
@@ -342,6 +351,73 @@ class YCETokenizer
         return false;
     }
 
+    bool VariableTokenizer()
+    {
+        if (!KeyTokenizer("variable"))
+        {
+            candidateTokens.clear();
+            maybeTokenizedPosition = 0;
+            return false;
+        }
+
+        SpaceTokenizer();
+        EnterTokenizer();
+
+        if (!EqualSignTokenizer())
+        {
+            candidateTokens.clear();
+            maybeTokenizedPosition = 0;
+            return false;
+        }
+
+        SpaceTokenizer();
+        EnterTokenizer();
+
+        if (IValueTokenizer())
+        {
+            tokenizedPosition += maybeTokenizedPosition;
+            maybeTokenizedPosition = 0;
+            tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+            candidateTokens.clear();
+
+            SpaceTokenizer();
+            EnterTokenizer();
+
+            if (TerminatorTokenizer())
+            {
+                tokenizedPosition += maybeTokenizedPosition;
+                maybeTokenizedPosition = 0;
+                tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                candidateTokens.clear();
+
+                return true;
+            }
+            return false;
+        }
+        if (SValueTokenzier())
+        {
+            tokenizedPosition += maybeTokenizedPosition;
+            maybeTokenizedPosition = 0;
+            tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+            candidateTokens.clear();
+
+            SpaceTokenizer();
+            EnterTokenizer();
+
+            if (TerminatorTokenizer())
+            {
+                tokenizedPosition += maybeTokenizedPosition;
+                maybeTokenizedPosition = 0;
+                tokens.insert(tokens.end(), candidateTokens.begin(), candidateTokens.end());
+                candidateTokens.clear();
+
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
     bool LeftBraceSignTokenizer()
     {
         if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "{")
@@ -385,6 +461,54 @@ class YCETokenizer
         if (IsAcceptableKeyword(key))
         {
             candidateTokens.push_back(make_tuple("running_mode", key));
+            return true;
+        }
+        return false;
+    }
+
+    bool LeftParentheseTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "(")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("left_parenthese", "("));
+            return true;
+        }
+        return false;
+    }
+
+    bool RightParentheseTokenizer()
+    {
+        if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == ")")
+        {
+            maybeTokenizedPosition += 1;
+            candidateTokens.push_back(make_tuple("right_parenthese", ")"));
+            return true;
+        }
+        return false;
+    }
+
+    bool ProgramTokenizer()
+    {
+        int i = 0;
+        while (maybeTokenizedPosition + tokenizedPosition + i < sourceCode.size())
+        {
+            string endChar = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition + i, 1);
+            if (endChar == "(" || endChar == " " || endChar == "\t")
+            {
+                break;
+            }
+            i++;
+        }
+        if (i == 0)
+        {
+            return false; // No key specified.
+        }
+        string key = string(sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, i));
+        maybeTokenizedPosition += i;
+        if (IsAcceptableKeyword(key))
+        {
+            candidateTokens.push_back(make_tuple("program", key));
             return true;
         }
         return false;
@@ -456,6 +580,8 @@ class YCETokenizer
         tokenizedPosition = 0;
         maybeTokenizedPosition = 0;
 
+        int inProgramNumber = 0;
+
         while (!IsEndOfFile())
         {
             switch (state)
@@ -464,6 +590,10 @@ class YCETokenizer
                 SpaceTokenizer();
                 EnterTokenizer();
                 if (ConstantTokenizer())
+                {
+                    break;
+                }
+                if (VariableTokenizer())
                 {
                     break;
                 }
@@ -489,7 +619,7 @@ class YCETokenizer
                     return false;
                 }
                 break;
-            case RUNNING_MODE: // Fix me: Ignored concrete programs tokenizer.
+            case RUNNING_MODE:
                 SpaceTokenizer();
                 EnterTokenizer();
                 if (RightBraceSignTokenizer())
@@ -510,16 +640,81 @@ class YCETokenizer
                     Reset();
                     return false;
                 }
+                else if (ProgramTokenizer())
+                {
+                    state = PROGRAM;
+                    break;
+                }
+                else
+                {
+                    Reset();
+                    return false;
+                }
+                break;
+            case PROGRAM:
+                SpaceTokenizer();
+                EnterTokenizer();
+
+                if (LeftParentheseTokenizer())
+                {
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (SValueTokenzier())
+                    {
+                        SpaceTokenizer();
+                        EnterTokenizer();
+                        if (RightParentheseTokenizer())
+                        {
+                            SpaceTokenizer();
+                            EnterTokenizer();
+                            if (TerminatorTokenizer())
+                            {
+                                if (inProgramNumber == 0)
+                                {
+                                    state = RUNNING_MODE;
+                                }
+
+                                break;
+                            }
+                            else if (LeftBraceSignTokenizer())
+                            {
+                                inProgramNumber += 1;
+                                SpaceTokenizer();
+                                EnterTokenizer();
+                                if (ProgramTokenizer())
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Reset();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (RightBraceSignTokenizer())
+                {
+                    SpaceTokenizer();
+                    EnterTokenizer();
+                    if (TerminatorTokenizer())
+                    {
+                        SpaceTokenizer();
+                        EnterTokenizer();
+                        if (inProgramNumber > 1)
+                        {
+                            inProgramNumber -= 1;
+                        }
+                        else
+                        {
+                            state = RUNNING_MODE;
+                        }
+                        break;
+                    }
+                }
                 Reset();
                 return false;
-                break;
-            case KEY:
-                break;
-            case VARIABLE:
-                break;
-            case I_VALUE:
-                break;
-            case S_VALUE:
                 break;
             }
         }
@@ -535,7 +730,7 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t {  };BadTest: \"BadValue\";#Comments\n");
+    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t { program(\"Test\"); program(\"Test2\"){program(\"In Test2\"){program(\"In In Test2\");}; }; };BadTest: \"BadValue\";var=123;#Comments\n");
 
     if (tokenizer.Tokenize())
     {
