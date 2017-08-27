@@ -734,7 +734,7 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t { program(\"Test\"); program(\"Test2\"){program(\"In Test2\"); }; };BadTest: \"BadValue\";var=123;#Comments\n");
+    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t { program(\"Test\"); program(\"Test2\"){program(\"In Test2\"){program(\"In In Test2\");}; }; };BadTest: \"BadValue\";var=123;#Comments\n");
 
     if (tokenizer.Tokenize())
     {
