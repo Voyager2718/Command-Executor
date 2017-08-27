@@ -655,9 +655,6 @@ class YCETokenizer
                 SpaceTokenizer();
                 EnterTokenizer();
 
-                cout << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
-                cout << "Count " << inProgramNumber << endl;
-
                 if (LeftParentheseTokenizer())
                 {
                     SpaceTokenizer();
@@ -703,7 +700,6 @@ class YCETokenizer
                     EnterTokenizer();
                     if (TerminatorTokenizer())
                     {
-                        cout << "Failed " << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
                         SpaceTokenizer();
                         EnterTokenizer();
                         if (inProgramNumber > 1)
