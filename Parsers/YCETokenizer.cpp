@@ -23,8 +23,7 @@ class YCETokenizer
     {
         NORMAL,
         RUNNING_MODE,
-        PROGRAM,
-        SUBPROGRAM
+        PROGRAM
     };
     STATE state;
 
@@ -652,25 +651,17 @@ class YCETokenizer
                     return false;
                 }
                 break;
-            case SUBPROGRAM:
-                SpaceTokenizer();
-                EnterTokenizer();
-                if (ProgramTokenizer())
-                {
-                    state = PROGRAM;
-                    break;
-                }
-                break;
             case PROGRAM:
                 SpaceTokenizer();
                 EnterTokenizer();
+
+                cout << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
+                cout << "Count " << inProgramNumber << endl;
 
                 if (LeftParentheseTokenizer())
                 {
                     SpaceTokenizer();
                     EnterTokenizer();
-                    cout << "Here 2" << endl;
-                    cout << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
                     if (SValueTokenzier())
                     {
                         SpaceTokenizer();
@@ -679,12 +670,12 @@ class YCETokenizer
                         {
                             SpaceTokenizer();
                             EnterTokenizer();
-                            cout << "Here 3" << inProgramNumber << endl;
-                            cout << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
                             if (TerminatorTokenizer())
                             {
-
-                                state = RUNNING_MODE;
+                                if (inProgramNumber == 0)
+                                {
+                                    state = RUNNING_MODE;
+                                }
 
                                 break;
                             }
@@ -695,12 +686,11 @@ class YCETokenizer
                                 EnterTokenizer();
                                 if (ProgramTokenizer())
                                 {
-                                    cout << "Here 1" << endl;
-                                    cout << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
                                     break;
                                 }
                                 else
                                 {
+                                    Reset();
                                     return false;
                                 }
                             }
@@ -713,9 +703,10 @@ class YCETokenizer
                     EnterTokenizer();
                     if (TerminatorTokenizer())
                     {
+                        cout << "Failed " << sourceCode.substr(tokenizedPosition + maybeTokenizedPosition) << endl;
                         SpaceTokenizer();
                         EnterTokenizer();
-                        if (inProgramNumber > 0)
+                        if (inProgramNumber > 1)
                         {
                             inProgramNumber -= 1;
                         }
@@ -743,7 +734,7 @@ class YCETokenizer
 
 int main(int argc, char *argv[])
 {
-    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t { program(\"Test\"); program(\"Test2\"); };BadTest: \"BadValue\";var=123;#Comments\n");
+    YCETokenizer tokenizer("version:\t12345;\nversion2:\t \"Test\";version3:67890;#Comments\nserial\t { program(\"Test\"); program(\"Test2\"){program(\"In Test2\"); }; };BadTest: \"BadValue\";var=123;#Comments\n");
 
     if (tokenizer.Tokenize())
     {
