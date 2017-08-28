@@ -100,7 +100,7 @@ class YCETokenizer
             string next = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1);
             if (next == " " || next == "\t")
             {
-                maybeTokenizedPosition++;
+                tokenizedPosition += 1;
             }
             else
             {
@@ -118,6 +118,30 @@ class YCETokenizer
                 tokenizedPosition += 2;
             }
             else if ((sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "\n"))
+            {
+                tokenizedPosition += 1;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    void BlankTokenizer(){
+        while (1)
+        {
+            string next = sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1);
+          
+            if (sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 2) == "\r\n")
+            {
+                tokenizedPosition += 2;
+            }
+            else if ((sourceCode.substr(maybeTokenizedPosition + tokenizedPosition, 1) == "\n"))
+            {
+                tokenizedPosition += 1;
+            }
+            if (next == " " || next == "\t")
             {
                 tokenizedPosition += 1;
             }
