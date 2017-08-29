@@ -25,6 +25,12 @@ class YCEParser
 
     int maybeTokenPosition;
 
+    void CommitParsePosition()
+    {
+        currentTokenPosition += maybeTokenPosition;
+        maybeTokenPosition = 0;
+    }
+
     bool GoToNextToken()
     {
         if (currentTokenPosition + maybeTokenPosition >= (signed int)tokens.size() - 1)
@@ -132,10 +138,92 @@ class YCEParser
         return false;
     }
 
-    void CommitParsePosition()
+    bool ProgramParser()
     {
-        currentTokenPosition += maybeTokenPosition;
-        maybeTokenPosition = 0;
+        int tmp = maybeTokenPosition;
+        if (!GoToNextToken())
+        {
+            maybeTokenPosition = tmp;
+            return false;
+        }
+
+        string tokenType = get<0>(currentToken);
+        if (tokenType == "program")
+        {
+            if (!GoToNextToken())
+            {
+                maybeTokenPosition = tmp;
+                return false;
+            }
+            tokenType = get<0>(currentToken);
+            if (tokenType == "left_parenthese")
+            {
+                if (!GoToNextToken())
+                {
+                    maybeTokenPosition = tmp;
+                    return false;
+                }
+                tokenType = get<0>(currentToken);
+                if (tokenType == "s_value")
+                {
+                    if (!GoToNextToken())
+                    {
+                        maybeTokenPosition = tmp;
+                        return false;
+                    }
+                    tokenType = get<0>(currentToken);
+                    if (tokenType == "right_parenthese")
+                    {
+                        return TerminatorParser();
+                    }
+                }
+            }
+        }
+        maybeTokenPosition = tmp;
+        return false;
+    }
+
+    bool RunningModeParser()
+    {
+        int tmp = maybeTokenPosition;
+        if (!GoToNextToken())
+        {
+            maybeTokenPosition = tmp;
+            return false;
+        }
+
+        string tokenType = get<0>(currentToken);
+        if (tokenType == "running_mode")
+        {
+            if (!GoToNextToken())
+            {
+                maybeTokenPosition = tmp;
+                return false;
+            }
+
+            tokenType = get<0>(currentToken);
+            if (tokenType == "left_brace")
+            {
+
+                while (ProgramParser())
+                {
+                    ProgramParser();
+                };
+
+                if (!GoToNextToken())
+                {
+                    maybeTokenPosition = tmp;
+                    return false;
+                }
+                tokenType = get<0>(currentToken);
+                if (tokenType == "right_brace")
+                {
+                    return TerminatorParser();
+                }
+            }
+        }
+        maybeTokenPosition = tmp;
+        return false;
     }
 
     bool ExpressionParser()
@@ -146,6 +234,11 @@ class YCEParser
             return ExpressionParser();
         }
         else if (ConstantParser())
+        {
+            CommitParsePosition();
+            return ExpressionParser();
+        }
+        else if (RunningModeParser())
         {
             CommitParsePosition();
             return ExpressionParser();
@@ -185,6 +278,20 @@ int main(int argc, char *argv[])
         make_tuple<string, string>("variable", "var"),
         make_tuple<string, string>("equal", "="),
         make_tuple<string, string>("s_value", "Hello"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("running_mode", "serial"),
+        make_tuple<string, string>("left_brace", "{"),
+        make_tuple<string, string>("program", "program"),
+        make_tuple<string, string>("left_parenthese", "("),
+        make_tuple<string, string>("s_value", "Test"),
+        make_tuple<string, string>("right_parenthese", ")"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("program", "program"),
+        make_tuple<string, string>("left_parenthese", "("),
+        make_tuple<string, string>("s_value", "Test"),
+        make_tuple<string, string>("right_parenthese", ")"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("right_brace", "}"),
         make_tuple<string, string>("terminator", ";"),
     };
 
