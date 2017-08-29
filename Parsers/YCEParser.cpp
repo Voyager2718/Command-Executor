@@ -183,6 +183,49 @@ class YCEParser
         return false;
     }
 
+    bool RunningModeParser()
+    {
+        int tmp = maybeTokenPosition;
+        if (!GoToNextToken())
+        {
+            maybeTokenPosition = tmp;
+            return false;
+        }
+
+        string tokenType = get<0>(currentToken);
+        if (tokenType == "running_mode")
+        {
+            if (!GoToNextToken())
+            {
+                maybeTokenPosition = tmp;
+                return false;
+            }
+
+            tokenType = get<0>(currentToken);
+            if (tokenType == "left_brace")
+            {
+
+                while (ProgramParser())
+                {
+                    ProgramParser();
+                };
+
+                if (!GoToNextToken())
+                {
+                    maybeTokenPosition = tmp;
+                    return false;
+                }
+                tokenType = get<0>(currentToken);
+                if (tokenType == "right_brace")
+                {
+                    return TerminatorParser();
+                }
+            }
+        }
+        maybeTokenPosition = tmp;
+        return false;
+    }
+
     bool ExpressionParser()
     {
         if (VariableParser())
@@ -195,7 +238,7 @@ class YCEParser
             CommitParsePosition();
             return ExpressionParser();
         }
-        else if (ProgramParser())
+        else if (RunningModeParser())
         {
             CommitParsePosition();
             return ExpressionParser();
@@ -236,10 +279,19 @@ int main(int argc, char *argv[])
         make_tuple<string, string>("equal", "="),
         make_tuple<string, string>("s_value", "Hello"),
         make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("running_mode", "serial"),
+        make_tuple<string, string>("left_brace", "{"),
         make_tuple<string, string>("program", "program"),
         make_tuple<string, string>("left_parenthese", "("),
         make_tuple<string, string>("s_value", "Test"),
         make_tuple<string, string>("right_parenthese", ")"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("program", "program"),
+        make_tuple<string, string>("left_parenthese", "("),
+        make_tuple<string, string>("s_value", "Test"),
+        make_tuple<string, string>("right_parenthese", ")"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("right_brace", "}"),
         make_tuple<string, string>("terminator", ";"),
     };
 
