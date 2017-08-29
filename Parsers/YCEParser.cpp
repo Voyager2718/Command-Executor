@@ -21,126 +21,68 @@ class YCEParser
 
     tuple<string, string> currentToken;
 
-    int currentTokenPosition = 0;
+    int currentTokenPosition;
 
     bool GoToNextToken()
     {
-        if (currentTokenPosition >= tokens.size())
+        if (currentTokenPosition >= (signed int)tokens.size())
         {
-            return false; // No more token.
+            return false;
         }
-        currentTokenPosition += 1;
-        currentToken = tokens[currentTokenPosition];
+        currentToken = tokens[++currentTokenPosition];
         return true;
     }
 
     bool ValueParser()
     {
+        if (!GoToNextToken())
+        {
+            return false;
+        }
         string tokenType = get<0>(currentToken);
         if (tokenType == "s_value")
         {
-            if (GoToNextToken())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return TerminatorParser();
         }
         else if (tokenType == "i_value")
         {
-            if (GoToNextToken())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return TerminatorParser();
         }
         return false;
     }
 
     bool TerminatorParser()
     {
+        if (!GoToNextToken())
+        {
+            return false;
+        }
         string tokenType = get<0>(currentToken);
         if (tokenType == "terminator")
         {
-            if (GoToNextToken())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
         return false;
     }
 
     bool VariableParser()
     {
+        if (!GoToNextToken())
+        {
+            return false;
+        }
         string tokenType = get<0>(currentToken);
         if (tokenType == "variable")
         {
-            if (GoToNextToken())
+            if (!GoToNextToken())
             {
-                string tokenType2 = get<0>(currentToken);
-                if (tokenType2 == "equal")
-                {
-                    if (GoToNextToken())
-                    {
-                        if (ValueParser())
-                        {
-                            if (GoToNextToken())
-                            {
-                                return TerminatorParser();
-                            }
-                        }
-                    }
-                }
+                return false;
             }
-        }
-        return false;
-    }
-
-    /*
-    bool RunnmingModeParser()
-    {
-        string tokenType = get<0>(currentToken);
-        if (tokenType == "running_mode")
-        {
-            if (GoToNextToken())
+            tokenType = get<0>(currentToken);
+            if (tokenType == "equal")
             {
-                string tokenType2 = get<0>(currentToken);
-                if (tokenType2 == "{")
-                {
-                    if (GoToNextToken())
-                    {
-                        ProgramParser
-                    }
-                }
+                return ValueParser();
             }
-        }
-        return false;
-    }
-    */
-
-    bool ProgramParser()
-    {
-        string tokenType = get<0>(currentToken);
-    }
-
-    bool ExpressionParser()
-    {
-        if (VariableParser())
-        {
-            return ExpressionParser();
-        }
-        else if (!GoToNextToken())
-        {
-            return true;
         }
         return false;
     }
@@ -153,6 +95,8 @@ class YCEParser
 
     bool Parse()
     {
+        currentTokenPosition = -1;
+        return VariableParser();
     }
 };
 
@@ -166,5 +110,5 @@ int main(int argc, char *argv[])
     };
 
     YCEParser parser(tokens);
-    cout << (parser.Parse() ? "True" : "False");
+    cout << (parser.Parse() ? "True" : "False") << endl;
 }
