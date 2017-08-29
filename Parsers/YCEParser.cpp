@@ -23,14 +23,29 @@ class YCEParser
 
     int currentTokenPosition;
 
+    int maybeTokenPosition;
+
     bool GoToNextToken()
     {
-        if (currentTokenPosition >= (signed int)tokens.size())
+        if (currentTokenPosition + maybeTokenPosition >= (signed int)tokens.size())
         {
             return false;
         }
-        currentToken = tokens[++currentTokenPosition];
+        maybeTokenPosition += 1;
+        currentToken = tokens[maybeTokenPosition + currentTokenPosition];
         return true;
+    }
+
+    bool IsEndOfTokens()
+    {
+        if (currentTokenPosition >= (signed int)tokens.size() - 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     bool ValueParser()
@@ -87,6 +102,21 @@ class YCEParser
         return false;
     }
 
+    bool ExpressionParser()
+    {
+        if (VariableParser())
+        {
+            currentTokenPosition += maybeTokenPosition;
+            maybeTokenPosition = 0;
+            return ExpressionParser();
+        }
+        else if (IsEndOfTokens())
+        {
+            return true;
+        }
+        return false;
+    }
+
   public:
     YCEParser(vector<tuple<string, string>> tokens)
     {
@@ -96,13 +126,18 @@ class YCEParser
     bool Parse()
     {
         currentTokenPosition = -1;
-        return VariableParser();
+        maybeTokenPosition = 0;
+        return ExpressionParser();
     }
 };
 
 int main(int argc, char *argv[])
 {
     vector<tuple<string, string>> tokens = {
+        make_tuple<string, string>("variable", "var"),
+        make_tuple<string, string>("equal", "="),
+        make_tuple<string, string>("s_value", "Hello"),
+        make_tuple<string, string>("terminator", ";"),
         make_tuple<string, string>("variable", "var"),
         make_tuple<string, string>("equal", "="),
         make_tuple<string, string>("s_value", "Hello"),
