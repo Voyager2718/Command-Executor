@@ -27,7 +27,7 @@ class YCEParser
 
     bool GoToNextToken()
     {
-        if (currentTokenPosition + maybeTokenPosition >= (signed int)tokens.size())
+        if (currentTokenPosition + maybeTokenPosition >= (signed int)tokens.size() - 1)
         {
             return false;
         }
