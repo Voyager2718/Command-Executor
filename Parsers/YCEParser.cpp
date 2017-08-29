@@ -82,8 +82,10 @@ class YCEParser
 
     bool VariableParser()
     {
+        int tmp = maybeTokenPosition;
         if (!GoToNextToken())
         {
+            maybeTokenPosition = tmp;
             return false;
         }
         string tokenType = get<0>(currentToken);
@@ -91,6 +93,7 @@ class YCEParser
         {
             if (!GoToNextToken())
             {
+                maybeTokenPosition = tmp;
                 return false;
             }
             tokenType = get<0>(currentToken);
@@ -99,15 +102,52 @@ class YCEParser
                 return ValueParser();
             }
         }
+        maybeTokenPosition = tmp;
         return false;
+    }
+
+    bool ConstantParser()
+    {
+        int tmp = maybeTokenPosition;
+        if (!GoToNextToken())
+        {
+            maybeTokenPosition = tmp;
+            return false;
+        }
+        string tokenType = get<0>(currentToken);
+        if (tokenType == "constant")
+        {
+            if (!GoToNextToken())
+            {
+                maybeTokenPosition = tmp;
+                return false;
+            }
+            tokenType = get<0>(currentToken);
+            if (tokenType == "colon")
+            {
+                return ValueParser();
+            }
+        }
+        maybeTokenPosition = tmp;
+        return false;
+    }
+
+    void CommitParsePosition()
+    {
+        currentTokenPosition += maybeTokenPosition;
+        maybeTokenPosition = 0;
     }
 
     bool ExpressionParser()
     {
         if (VariableParser())
         {
-            currentTokenPosition += maybeTokenPosition;
-            maybeTokenPosition = 0;
+            CommitParsePosition();
+            return ExpressionParser();
+        }
+        else if (ConstantParser())
+        {
+            CommitParsePosition();
             return ExpressionParser();
         }
         else if (IsEndOfTokens())
@@ -136,6 +176,10 @@ int main(int argc, char *argv[])
     vector<tuple<string, string>> tokens = {
         make_tuple<string, string>("variable", "var"),
         make_tuple<string, string>("equal", "="),
+        make_tuple<string, string>("s_value", "Hello"),
+        make_tuple<string, string>("terminator", ";"),
+        make_tuple<string, string>("constant", "var"),
+        make_tuple<string, string>("colon", "="),
         make_tuple<string, string>("s_value", "Hello"),
         make_tuple<string, string>("terminator", ";"),
         make_tuple<string, string>("variable", "var"),
