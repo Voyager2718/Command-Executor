@@ -18,37 +18,41 @@ using std::shared_ptr;
 
 class Command : public IRunnable
 {
-  protected:
-    int timeout;
-    list<shared_ptr<AValidator>> validators;
-    list<shared_ptr<AOutputChecker>> outputCheckers;
-    string command;
-    string description = "Default command.";
+protected:
+  int timeout;
+  list<shared_ptr<AValidator>> validators;
+  list<shared_ptr<AOutputChecker>> outputCheckers;
+  string command = "";
+  string description = "Default command.";
 
-  public:
-    Command(int timeout, string description);
+public:
+  Command(string command);
 
-    Command();
+  Command(string command, int timeout, string description);
 
-    virtual ~Command() = default;
+  Command(int timeout, string description);
 
-    Command(const Command &command) = default;
+  Command();
 
-    virtual Result Run(vector<string> arguments = vector<string>()) override;
+  virtual ~Command() = default;
 
-    virtual void SetCommand(string command);
+  Command(const Command &command) = default;
 
-    virtual string GetCommand();
+  virtual Result Run(vector<string> arguments = vector<string>()) override;
 
-    virtual void SetTimeout(int timeout);
+  virtual void SetCommand(string command);
 
-    virtual int GetTimeout();
+  virtual string GetCommand();
 
-    virtual void AddValidator(shared_ptr<AValidator> validator);
+  virtual void SetTimeout(int timeout);
 
-    virtual void AddOutputChecker(shared_ptr<AOutputChecker> outputChecker);
+  virtual int GetTimeout();
 
-    virtual string GetDescription();
+  virtual void AddValidator(shared_ptr<AValidator> validator);
+
+  virtual void AddOutputChecker(shared_ptr<AOutputChecker> outputChecker);
+
+  virtual string GetDescription();
 };
 
 #endif
