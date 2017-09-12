@@ -14,6 +14,10 @@ using std::string;
 class ParallelCommand : public Command
 {
   public:
+    ParallelCommand(string command);
+    
+    ParallelCommand(string command, int timeout, string description);
+
     ParallelCommand(int timeout, string description);
 
     ParallelCommand();

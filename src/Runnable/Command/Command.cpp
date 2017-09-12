@@ -1,28 +1,39 @@
 #include "Command.h"
 
+Command::Command(string command)
+{
+    SetCommand(command);
+}
+
+Command::Command(string command, int timeout, string description)
+{
+    SetCommand(command);
+    SetTimeout(timeout);
+
+    this->description = description;
+}
+
 Command::Command(int timeout, string description)
 {
-    this->timeout = timeout;
-    this->description = description;
+    SetTimeout(timeout);
 
-    Command();
+    this->description = description;
 }
 
 Command::Command()
 {
-#if defined _MSC_VER
-    command = "./test";
-#elif defined __GNUC__
-    command = "./test";
-#else
-    command = "./test";
-#endif
     description = "Command.cpp";
 }
 
 // FIXME: Add IValidator and IOutputChecker.
 Result Command::Run(vector<string> arguments)
 {
+    if (command == "")
+    {
+        (Report::GetInstance()).AddReport("[FATAL] CMD-0002: Command not set. [Command]", FAILED);
+        return FAILED;
+    }
+
     pid_t pid;
     int status;
     int fd[2];

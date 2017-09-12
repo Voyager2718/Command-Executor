@@ -18,16 +18,18 @@ Result ParallelTransaction::Run(vector<string> arguments)
             pool.enqueue([command, arguments] {
                 return command->Run(arguments);
             }));
-        /*
-        if (results.back().get() == IGNORED)
-        {
-            haveIgnored = true;
-        }
-        */
-        if (results.back().get() == FAILED)
-        {
-            return FAILED;
-        }
+    }
+
+    /*
+    if (results.back().get() == IGNORED)
+    {
+        haveIgnored = true;
+    }
+    */
+
+    if (results.back().get() == FAILED)
+    {
+        return FAILED;
     }
 
     if (haveIgnored)

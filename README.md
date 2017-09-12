@@ -15,7 +15,7 @@ The main purpose of this project is to create an universal framework so that we 
 |Transaction & ParallelTransaction|80%|Serial Transaction and Parallel Transaction can be used, argument injection still in development. ParallelTransaction has some minor bugs.|
 |Executor|90%|Executor can be used, argument injection still in development.|
 |Launcher|0%|Not implemented yet.|
-|Parser|45%|Implemented v 0.0.1 YCE file tokenizer|
+|Parser|75%|Implemented v 0.0.1 YCE file tokenizer and parser.|
 |Report|100%|Finished.|
 |GlobalArea|0%|Not implemented yet.|
 
