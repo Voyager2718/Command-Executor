@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <memory>
 
+#include "../../ReportString.h"
 #include "../../Report/Report.h"
 #include "../IRunnable.h"
 #include "../../Validator/AValidator.h"

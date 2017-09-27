@@ -30,7 +30,7 @@ Result Command::Run(vector<string> arguments)
 {
     if (command == "")
     {
-        (Report::GetInstance()).AddReport("[FATAL] CMD-0002: Command not set. [Command]", FAILED);
+        (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("CMD-0002", "Command"), FAILED);
         return FAILED;
     }
 
@@ -42,7 +42,7 @@ Result Command::Run(vector<string> arguments)
 
     if ((pid = fork()) < 0)
     {
-        (Report::GetInstance()).AddReport("[FATAL] FORK-0001: Unable to create new process. [Command]", FAILED);
+        (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("FORK-0001", "Command"), FAILED);
         return FAILED;
     }
     else if (pid == 0)
@@ -66,17 +66,17 @@ Result Command::Run(vector<string> arguments)
 
         if (execIsFailed)
         {
-            (Report::GetInstance()).AddReport("[FATAL] EXEC-0001: Cannot execute command. [Command]", FAILED);
+            (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("EXEC-0001", "Command"), FAILED);
             return FAILED;
         }
         else if (WEXITSTATUS(status) != 0)
         {
-            (Report::GetInstance()).AddReport("[FATAL] CMD-0001: Command execution failed. [Command]", FAILED);
+            (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("CMD-0001", "Command"), FAILED);
             return FAILED;
         }
         else
         {
-            (Report::GetInstance()).AddReport("[SUCC]: Process execution successful. [Command]", SUCCESSFUL);
+            (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("SUCC-0001", "Command"), SUCCESSFUL);
             return SUCCESSFUL;
         }
     }
