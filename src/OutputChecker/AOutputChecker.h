@@ -12,9 +12,6 @@ class AOutputChecker
 {
 protected:
   map<string, string> values;
-  string description;
-  string exceptionDescription;
-  string successDescription;
 
 public:
   AOutputChecker() = default;
@@ -23,13 +20,17 @@ public:
 
   AOutputChecker(const AOutputChecker &outputChecker) = default;
 
-  virtual Result Check(); // FIXME: Put output into check or use another mechanism?
+  virtual Result Check(string allOutput) = 0;
 
-  virtual string getSuccessDescription();
+  virtual string GetSuccessDescription() = 0;
 
-  virtual string getExceptionDescription();
+  virtual string GetFatalDescription() = 0;
 
-  virtual map<string, string> getValuesMap();
+  virtual string GetIgnoredDescription() = 0;
+
+  virtual string GetLastReportNumber() = 0;
+
+  virtual map<string, string> GetValuesMap();
 };
 
 #endif

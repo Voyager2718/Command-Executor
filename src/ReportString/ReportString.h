@@ -33,6 +33,8 @@ public:
     */
   int AddReportString(ReportType type, string reportno, string description);
 
+  string GetReportString(ReportType type, string reportno, string description, string fromFile);
+
   string GetReportString(string reference, string fromFile);
 };
 
