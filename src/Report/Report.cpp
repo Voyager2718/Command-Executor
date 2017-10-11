@@ -21,7 +21,10 @@ void Report::AddReport(string report, Result result)
         {"timestamp", ytime::GetTime()},
         {"result", ResultToString(result)},
         {"report", report}};
+
+    m.lock();
     reports.push_back(mp);
+    m.unlock();
 }
 
 list<map<string, string>> Report::GetReports()
