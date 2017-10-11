@@ -5,7 +5,7 @@ void ParallelTransaction::AddCommand(shared_ptr<ParallelCommand> command)
     commands.push_back(command);
 }
 
-Result ParallelTransaction::Run(vector<string> arguments)
+Result ParallelTransaction::Run(vector<string> arguments, bool printOutputs)
 {
     bool haveIgnored = false;
 

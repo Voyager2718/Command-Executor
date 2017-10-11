@@ -5,7 +5,7 @@ void Transaction::AddCommand(shared_ptr<Command> command)
     commands.push_back(command);
 }
 
-Result Transaction::Run(vector<string> arguments)
+Result Transaction::Run(vector<string> arguments, bool printOutputs)
 {
     bool haveIgnored = false;
     for (auto i : commands)
