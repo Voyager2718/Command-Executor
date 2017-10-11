@@ -50,7 +50,7 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
         return FAILED;
     }
 
-    if ((pid = vfork()) < 0)
+    if ((pid = fork()) < 0)
     {
         (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("FORK-0001", "Command"), FAILED);
         return FAILED;
@@ -67,6 +67,15 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
 
         args[arguments.size() + 1] = (char *)0;
 
+        dup2(stdoutfd[1], STDOUT_FILENO);
+        dup2(stderrfd[1], STDERR_FILENO);
+
+        close(stdoutfd[0]);
+        close(stdoutfd[1]);
+
+        close(stderrfd[0]);
+        close(stderrfd[1]);
+
         if (execvp(command.c_str(), (char *const *)args))
         {
             execFailed = true;
@@ -81,6 +90,29 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
 
         close(execStatus[1]);
         read(execStatus[0], &execFailed, sizeof(bool));
+
+        char buffer[1024];
+        FILE *out, *err;
+
+        close(stdoutfd[1]);
+        close(stderrfd[1]);
+
+        out = fdopen(stdoutfd[0], "r");
+        err = fdopen(stderrfd[0], "r");
+
+        string out_str, err_str;
+
+        while (fgets(buffer, sizeof(buffer), out))
+        {
+            string tmp(buffer);
+            out_str += tmp;
+        }
+
+        while (fgets(buffer, sizeof(buffer), err))
+        {
+            string tmp(buffer);
+            err_str += tmp;
+        }
 
         if (execFailed)
         {

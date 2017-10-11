@@ -16,12 +16,14 @@ yrandom=./lib/yrandom
 settings=.
 reportString=./src/ReportString
 
-rmr_outputs=find . -name "*.o" -delete
+main_dep=./build/yce.a
+make: $(main)/main.cpp $(main_dep)
+	g++ main.cpp $(main_dep) -o main $(opt)
 
-main_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o $(build)/ReportString.o
+yce_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o $(build)/ReportString.o
 
-make: $(main)/main.cpp $(runnable)/IRunnable.h $(main_dep)
-	$(CC) $(main_dep) $(main)/main.cpp -o $(main)/main $(opt)
+$(build)/yce.a: $(yce_dep)
+	ar rcs build/yce.a build/*.o
 
 report_dep=$(build)/ytime.o $(build)/Result.o
 
@@ -31,7 +33,7 @@ $(build)/Report.o: $(report)/Report.h $(report)/Report.cpp $(report_dep)
 report_str_dep=
 
 $(build)/ReportString.o: $(reportString)/ReportString.cpp
-	$(CC) -c $(report_str_dep) $(reportString)/ReportString.cpp -o $(build)/ReportString.o
+	$(CC) -c $(report_str_dep) $(reportString)/ReportString.cpp -o $(build)/ReportString.o $(opt)
 
 executor_dep=$(build)/Report.o
 
@@ -79,4 +81,5 @@ $(build)/ytime.o: $(ytime)/ytime.cpp $(ytime)/ytime.h $(ytime_dep)
 	$(CC) -c $(ytime_dep) $(ytime)/ytime.cpp -o $(build)/ytime.o $(opt)
 
 rclean:
-	rm -f $(main)/main; $(rmr_outputs)
+	rm -f $(main)/main
+	find . -name "*.[ao]" -delete
