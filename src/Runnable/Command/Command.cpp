@@ -50,8 +50,6 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
         return FAILED;
     }
 
-    pipe(errFd);
-
     if ((pid = vfork()) < 0)
     {
         (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("FORK-0001", "Command"), FAILED);
@@ -71,7 +69,6 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
 
         if (execvp(command.c_str(), (char *const *)args))
         {
-            printf("pid=%d, pipe[0]=%d, pipe[1]=%d, this=%p, &pipe=%p\n", getpid(), execStatus[0], execStatus[1], this, execStatus);
             execFailed = true;
             close(execStatus[0]);
             write(execStatus[1], &execFailed, sizeof(bool));
@@ -84,8 +81,6 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
 
         close(execStatus[1]);
         read(execStatus[0], &execFailed, sizeof(bool));
-
-        printf("Here WEXITSTATUS=%d, execFailed=%d, pid=%d, pipe[0]=%d, pipe[1]=%d, this=%p, &pipe=%p\n", WEXITSTATUS(exitStatus), execFailed, pid, execStatus[0], execStatus[1], this, execStatus);
 
         if (execFailed)
         {
