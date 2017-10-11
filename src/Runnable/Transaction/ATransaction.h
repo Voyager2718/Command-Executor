@@ -20,16 +20,16 @@ using std::shared_ptr;
 
 class ATransaction : public IRunnable
 {
-  protected:
-    string description;
-    list<map<string, string>> values;
+protected:
+  string description;
+  list<map<string, string>> values;
 
-  public:
-    ATransaction();
+public:
+  ATransaction();
 
-    ATransaction(string description);
-    
-    virtual Result Run(vector<string> arguments = vector<string>()) = 0;
+  ATransaction(string description);
+
+  virtual Result Run(vector<string> arguments = vector<string>(), bool printOutputs = false) = 0;
 };
 
 #endif
