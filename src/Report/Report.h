@@ -6,12 +6,15 @@
 #include <string>
 #include <iostream>
 #include <functional>
+#include <thread>
+#include <mutex>
 
 #include "../../lib/ytime/ytime.h"
 #include "../Result/Result.h"
 
 using std::list;
 using std::map;
+using std::mutex;
 using std::function;
 using std::string;
 using std::cout;
@@ -25,6 +28,8 @@ private:
   list<map<string, string>> reports; // map{timestamp, user defined report string}
 
   static void Printer(string timestamp, string result, string report);
+
+  mutex m;
 
 public:
   static Report &GetInstance();
