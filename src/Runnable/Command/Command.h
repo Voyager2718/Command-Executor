@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <memory>
 
-#include "../../ReportString.h"
+#include "../../ReportString/ReportString.h"
 #include "../../Report/Report.h"
 #include "../IRunnable.h"
 #include "../../Validator/AValidator.h"
@@ -39,7 +39,7 @@ public:
 
   Command(const Command &command) = default;
 
-  virtual Result Run(vector<string> arguments = vector<string>()) override;
+  virtual Result Run(vector<string> arguments = vector<string>(), bool printOutputs = false) override;
 
   virtual void SetCommand(string command);
 

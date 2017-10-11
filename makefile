@@ -14,10 +14,11 @@ parallel_transaction=./src/Runnable/Transaction/ParallelTransaction
 ytime=./lib/ytime
 yrandom=./lib/yrandom
 settings=.
+reportString=./src/ReportString
 
 rmr_outputs=find . -name "*.o" -delete
 
-main_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o
+main_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o $(build)/ReportString.o
 
 make: $(main)/main.cpp $(runnable)/IRunnable.h $(main_dep)
 	$(CC) $(main_dep) $(main)/main.cpp -o $(main)/main $(opt)
@@ -26,6 +27,11 @@ report_dep=$(build)/ytime.o $(build)/Result.o
 
 $(build)/Report.o: $(report)/Report.h $(report)/Report.cpp $(report_dep)
 	$(CC) -c $(report_dep) $(report)/Report.cpp -o $(build)/Report.o $(opt)
+
+report_str_dep=
+
+$(build)/ReportString.o: $(reportString)/ReportString.cpp
+	$(CC) -c $(report_str_dep) $(reportString)/ReportString.cpp -o $(build)/ReportString.o
 
 executor_dep=$(build)/Report.o
 

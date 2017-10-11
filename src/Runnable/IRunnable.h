@@ -14,8 +14,8 @@ using std::function;
 
 class IRunnable
 {
-public:
-    virtual Result Run(vector<string> arguments = vector<string>()) = 0;
+  public:
+    virtual Result Run(vector<string> arguments = vector<string>(), bool printOutputs = false) = 0;
 };
 
 #endif
