@@ -35,10 +35,25 @@ Result Command::Run(vector<string> arguments)
     }
 
     pid_t pid;
+<<<<<<< Updated upstream
     int status;
     int fd[2];
 
     pipe(fd);
+=======
+
+    int exitStatus;
+
+    bool execFailed = false;
+
+    int stdoutfd[2], stderrfd[2], execStatus[2];
+
+    if (pipe(stdoutfd) || pipe(stderrfd) || pipe(execStatus))
+    {
+        (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("PIPE-0001", "Command"), FAILED);
+        return FAILED;
+    }
+>>>>>>> Stashed changes
 
     if ((pid = fork()) < 0)
     {
@@ -47,6 +62,7 @@ Result Command::Run(vector<string> arguments)
     }
     else if (pid == 0)
     {
+<<<<<<< Updated upstream
         close(fd[0]);
         bool execStatus = false;
         if (execlp(command.c_str(), NULL) != 0)
@@ -54,31 +70,58 @@ Result Command::Run(vector<string> arguments)
             execStatus = true;
             write(fd[1], &execStatus, sizeof(bool));
             exit(FAILED);
+=======
+        const char **args = (const char **)malloc(sizeof(char) * (arguments.size() + 2));
+        args[0] = command.c_str();
+
+        for (int i = 1; i < arguments.size() + 1; i++)
+        {
+            args[i] = arguments[i - 1].c_str();
+        }
+
+        args[arguments.size() + 1] = (char *)0;
+
+        if (execvp(command.c_str(), (char *const *)args))
+        {
+            printf("pid=%d, pipe[0]=%d, pipe[1]=%d, this=%p, &pipe=%p\n", getpid(), execStatus[0], execStatus[1], this, execStatus);
+            execFailed = true;
+            close(execStatus[0]);
+            write(execStatus[1], &execFailed, sizeof(bool));
+            exit(1);
+>>>>>>> Stashed changes
         }
     }
     else
     {
+<<<<<<< Updated upstream
         wait(&status);
 
         bool execIsFailed = false;
         close(fd[1]);
         execIsFailed = read(fd[0], &execIsFailed, sizeof(bool));
+=======
+        waitpid(pid, &exitStatus, 0);
 
-        if (execIsFailed)
+        close(execStatus[1]);
+        read(execStatus[0], &execFailed, sizeof(bool));
+
+        printf("Here WEXITSTATUS=%d, execFailed=%d, pid=%d, pipe[0]=%d, pipe[1]=%d, this=%p, &pipe=%p\n", WEXITSTATUS(exitStatus), execFailed, pid, execStatus[0], execStatus[1], this, execStatus);
+>>>>>>> Stashed changes
+
+        if (execFailed)
         {
             (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("EXEC-0001", "Command"), FAILED);
             return FAILED;
         }
-        else if (WEXITSTATUS(status) != 0)
+
+        if (WEXITSTATUS(exitStatus))
         {
             (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("CMD-0001", "Command"), FAILED);
             return FAILED;
         }
-        else
-        {
-            (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("SUCC-0001", "Command"), SUCCESSFUL);
-            return SUCCESSFUL;
-        }
+
+        (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString("SUCC-0001", "Command"), SUCCESSFUL);
+        return SUCCESSFUL;
     }
     return FAILED;
 }

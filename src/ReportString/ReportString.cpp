@@ -54,5 +54,7 @@ ReportString::ReportString()
 
     AddReportString(FATAL, "EXEC-0001", "Cannot execute command.");
 
+    AddReportString(FATAL, "PIPE-0001", "Cannot create pipe.");
+
     AddReportString(FATAL, "FORK-0001", "Unable to create new process.");
 }
