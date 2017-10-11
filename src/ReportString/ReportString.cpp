@@ -43,6 +43,31 @@ string ReportString::GetReportString(string reportno, string fromFile)
     return (reportStrings[reportno] + "[" + fromFile + "]");
 }
 
+string ReportString::GetReportString(ReportType type, string reportno, string description, string fromFile)
+{
+    string tmp = "";
+
+    switch (type)
+    {
+    case FATAL:
+        tmp += "FATAL";
+        break;
+    case WARNING:
+        tmp += "WARNING";
+        break;
+    case INFO:
+        tmp += "INFO";
+        break;
+    case SUCCESS:
+        tmp += "SUCC";
+        break;
+    }
+
+    tmp = "[" + tmp + "] " + reportno + ": " + description + " [" + fromFile + "]";
+
+    return tmp;
+}
+
 ReportString::ReportString()
 {
     AddReportString(SUCCESS, "SUCC-0001", "Process execution successful.");
@@ -57,4 +82,8 @@ ReportString::ReportString()
     AddReportString(FATAL, "PIPE-0001", "Cannot create pipe.");
 
     AddReportString(FATAL, "FORK-0001", "Unable to create new process.");
+
+    AddReportString(SUCCESS, "OUTPUT-0001", "Output checker has successfully checked output.");
+    AddReportString(INFO, "OUTPUT-0002", "Output checker has checked output, with some ignorable exceptions.");
+    AddReportString(FATAL, "OUTPUT-0003", "Output checker has found incorrect outputs.");
 }

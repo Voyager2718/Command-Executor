@@ -100,18 +100,50 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
         out = fdopen(stdoutfd[0], "r");
         err = fdopen(stderrfd[0], "r");
 
-        string out_str, err_str;
+        string outStr, errStr;
 
         while (fgets(buffer, sizeof(buffer), out))
         {
             string tmp(buffer);
-            out_str += tmp;
+            outStr += tmp;
         }
 
         while (fgets(buffer, sizeof(buffer), err))
         {
             string tmp(buffer);
-            err_str += tmp;
+            errStr += tmp;
+        }
+
+        for (auto stdoutChecker : stdoutCheckers)
+        {
+            switch (stdoutChecker->Check(outStr))
+            {
+            case SUCCESSFUL:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(SUCCESS, stdoutChecker->GetLastReportNumber(), stdoutChecker->GetSuccessDescription(), "StdOutputChecker"), SUCCESSFUL);
+                break;
+            case IGNORED:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(INFO, stdoutChecker->GetLastReportNumber(), stdoutChecker->GetIgnoredDescription(), "StdOutputChecker"), IGNORED);
+                break;
+            case FAILED:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(FATAL, stdoutChecker->GetLastReportNumber(), stdoutChecker->GetFatalDescription(), "StdOutputChecker"), FAILED);
+                break;
+            }
+        }
+
+        for (auto stderrChecker : stderrCheckers)
+        {
+            switch (stderrChecker->Check(errStr))
+            {
+            case SUCCESSFUL:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(SUCCESS, stderrChecker->GetLastReportNumber(), stderrChecker->GetSuccessDescription(), "ErrOutputChecker"), SUCCESSFUL);
+                break;
+            case IGNORED:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(INFO, stderrChecker->GetLastReportNumber(), stderrChecker->GetIgnoredDescription(), "ErrOutputChecker"), IGNORED);
+                break;
+            case FAILED:
+                (Report::GetInstance()).AddReport((ReportString::GetInstance()).GetReportString(FATAL, stderrChecker->GetLastReportNumber(), stderrChecker->GetFatalDescription(), "ErrOutputChecker"), FAILED);
+                break;
+            }
         }
 
         if (execFailed)
@@ -152,14 +184,19 @@ int Command::GetTimeout()
     return timeout;
 }
 
+void Command::AddStdoutChecker(shared_ptr<IStdoutChecker> stdoutChecker)
+{
+    stdoutCheckers.push_back(stdoutChecker);
+}
+
+void Command::AddStderrChecker(shared_ptr<IStderrChecker> stderrChecker)
+{
+    stderrCheckers.push_back(stderrChecker);
+}
+
 void Command::AddValidator(shared_ptr<AValidator> validator)
 {
     validators.push_back(validator);
-}
-
-void Command::AddOutputChecker(shared_ptr<AOutputChecker> outputChecker)
-{
-    outputCheckers.push_back(outputChecker);
 }
 
 string Command::GetDescription()
