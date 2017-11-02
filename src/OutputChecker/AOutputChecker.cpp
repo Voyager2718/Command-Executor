@@ -5,21 +5,7 @@
 using std::map;
 using std::string;
 
-Result AOutputChecker::Check()
-{
-}
-
-string AOutputChecker::getSuccessDescription()
-{
-    return successDescription;
-}
-
-string AOutputChecker::getExceptionDescription()
-{
-    return exceptionDescription;
-}
-
-map<string, string> getValuesMap()
+map<string, string> AOutputChecker::GetValuesMap()
 {
     return values;
 }

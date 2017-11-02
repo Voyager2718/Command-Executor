@@ -5,21 +5,29 @@ Also, this project enables you to validate the outputs and the results of comman
 
 The main purpose of this project is to create an universal framework so that we don't have to worry about how does a command work. What we need to do is to create a Command or a Transaction, and let them be called by users.
 
-# Status
-|Functionality|Progress|Status|
-|-------------|--------|------|
-|Architecture|50%|Makefile and source codes should be re-arranged. What's more, after finished this project, rule of three/five should also be implemented too.|
-|Command & ParallelCommand|66%|Command & ParallelCommand can be used, OutputChecker and Validator are still not implemented.|
-|OutputChecker|0%|Not implemented yet.|
-|Validator|0%|Not implemented yet.|
-|Transaction & ParallelTransaction|80%|Serial Transaction and Parallel Transaction can be used, argument injection still in development. ParallelTransaction has some minor bugs.|
-|Executor|90%|Executor can be used, argument injection still in development.|
-|Launcher|0%|Not implemented yet.|
-|Parser|75%|Implemented v 0.0.1 YCE file tokenizer and parser.|
-|Report|100%|Finished.|
-|GlobalArea|0%|Not implemented yet.|
+# Mechanism
+For execution, we have 2 classes inherite from `IRunnable` called `Command` and `Transaction`. Both these 2 classes have `Run()` while `Run()` in `Command` execute certain commands/programs and `Run()` in `Transaction` just call `Run()` into `Command`. `Transaction` is designed to run multiple `Command`.
 
-# YCE file
+In `Command` class, we can add a command or a program that needs to be run. Also, we can inheritate `OutputChecker` and `Validator` and add them to the instance of `Command`. During execution, `Command` will `fork()` and use `exec()` family to execute command or program, then redirect `STDOUT_FILENO` and `STDERR_FILENO` to desinated output `OutputChecker`. After execution, `Command` will execute `Validator` to do the verification. No matter which one of these operations failed, `Command` will return `Result.FAILED`.
+
+In Transaction, we can add multiple `ParallelCommand` to `ParallelTransaction` to run multiple commands/programs at the same time. We use a thread pool to create multi-threads to call `Run()` in `Command`. You can modify the number of maximum threads in `Settings.h`.
+
+`Executor` contains a list of `IRunnable` so that we can add both `Command` and `Transaction` into `Executor`. When we add a `Transaction` as well as a `ParallelTransaction` into `Executor`, then commands/programs will be executed in serial mode first, then in parallel mode.
+
+For report generation, we created a singleton class called `Report`. After command execution in `Command`, `Transaction` will collect execution report and add them to `Report` automatically.
+
+## Further functionalities
+### Execute command with desinated user
+We are developing a mechanism to execute commands/programs with desinated users. What users have to do is to indicate which user that they want to use for certain commands/programs and provide appropriate password if needed.
+
+### Improved scalability
+C++ is not easy to control, so we support using other programming language by using either *shared object** or programs in other languages.
+
+The class `Parser` is designed to parse a file that describe which commands/programs should be run in either serial or parallel mode. Then `Parser` should return an `Executor` that can be used easily.
+
+Officially, we recommand to use YCE file and YCE parser.
+
+#### YCE file
 For those who don't want to modify C++ codes, you can use YCE file to integrate your command/program into this project.
 
 YCE(YCE Command Executor) file describes command/program location, what kind of arguments should be pass to it, how to execute, what kind of OutputChecker/Validator should be used.
@@ -58,6 +66,10 @@ YCE file v0.0.1 supports following lexical rules:
     - #comments\r\n
 
 You can put yce file reference in both parallel and serial part. However, as YCE file can contains both parallel and serial tasks, if you want to put yce file reference in parallel part, you MUST insure that there's no serial tasks in referenced YCE file.
+
+
+### Multi-nodes
+In order to execute commands/programs on multi-nodes environment, we plan to create a daemon that listens to certain port, sending and receiving parsable strings to achieve multi-nodes execution.
 
 # Components
 ## Settings
@@ -130,3 +142,63 @@ This class CANNOT be inherited.
 
 ## Result
 `Result` is an enum which defines three result status `SUCCESSFUL`, `FAILED` and `IGNORED`. `IGNORED` means that during execution, one or more failures were hit, but ALL of them can be ignored.
+
+# Example
+```c++
+#include <iostream>
+#include <memory>
+
+#include "src/Executor/Executor.h"
+#include "src/Runnable/Command/Command.h"
+#include "src/Runnable/IRunnable.h"
+#include "src/Runnable/Transaction/ParallelTransaction/ParallelTransaction.h"
+#include "src/Runnable/Command/ParallelCommand/ParallelCommand.h"
+#include "src/Runnable/Transaction/Transaction.h"
+
+using std::cout;
+using std::cin;
+using std::endl;
+
+using std::shared_ptr;
+using std::make_shared;
+
+#include "src/OutputChecker/IStdoutChecker.h"
+
+/**
+  * MyStdoutChecker that checks the std output.
+  */
+class MyStdoutChecker : public IStdoutChecker
+{
+    Result Check(string allOutput)
+    {
+        cout << "Output Checker: " << allOutput;
+        return SUCCESSFUL;
+    }
+
+    string GetSuccessDescription() { return "Succ"; }
+
+    string GetFatalDescription() { return "Fatal"; }
+
+    string GetIgnoredDescription() { return "Ignored"; }
+
+    string GetLastReportNumber() { return "TEST-0001"; }
+};
+
+int main(int argc, char *argv[])
+{
+    Executor executor;  // Create an Executor.
+    shared_ptr<ParallelTransaction> transaction = make_shared<ParallelTransaction>();   // Create a ParallelTransaction.
+
+    shared_ptr<ParallelCommand> tmp = make_shared<ParallelCommand>("./test_programs/print1");   // Create a ParallelCommand that can be executed in parallel.
+
+    tmp->AddStdoutChecker(make_shared<stdouttest>());   // Add a std output checker.
+
+    transaction->AddCommand(tmp);   // Add the parallel command with output checker into parallel transaction.
+    transaction->AddCommand(make_shared<ParallelCommand>("./test_programs/print2"));    // Add the parallel command without output checker into parallel transaction.
+
+    executor.AddRunnable(transaction);  // Add parallel transaction into executor.
+
+    executor.Execute();
+    return 0;
+}
+```

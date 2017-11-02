@@ -11,6 +11,9 @@
 #include "../IRunnable.h"
 #include "../../Validator/AValidator.h"
 #include "../../OutputChecker/AOutputChecker.h"
+#include "../../OutputChecker/IStdoutChecker.h"
+#include "../../OutputChecker/IStderrChecker.h"
+#include "../../../Settings.h"
 
 using std::list;
 using std::string;
@@ -22,7 +25,8 @@ class Command : public IRunnable
 protected:
   int timeout;
   list<shared_ptr<AValidator>> validators;
-  list<shared_ptr<AOutputChecker>> outputCheckers;
+  list<shared_ptr<IStdoutChecker>> stdoutCheckers;
+  list<shared_ptr<IStderrChecker>> stderrCheckers;
   string command = "";
   string description = "Default command.";
 
@@ -51,7 +55,9 @@ public:
 
   virtual void AddValidator(shared_ptr<AValidator> validator);
 
-  virtual void AddOutputChecker(shared_ptr<AOutputChecker> outputChecker);
+  virtual void AddStdoutChecker(shared_ptr<IStdoutChecker> stdoutChecker);
+
+  virtual void AddStderrChecker(shared_ptr<IStderrChecker> stderrChecker);
 
   virtual string GetDescription();
 };
