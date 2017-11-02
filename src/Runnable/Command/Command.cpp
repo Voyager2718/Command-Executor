@@ -91,7 +91,7 @@ Result Command::Run(vector<string> arguments, bool printoutputFd)
         close(execStatus[1]);
         read(execStatus[0], &execFailed, sizeof(bool));
 
-        char buffer[1024];
+        char buffer[DEFAULT_BUFFER_SIZE];
         FILE *out, *err;
 
         close(stdoutfd[1]);

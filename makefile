@@ -1,5 +1,5 @@
 CC=g++
-opt=-std=c++11 -Wno-unused-command-line-argument
+opt=-std=c++11 -Wno-unused-command-line-argument -O3 -Wall
 
 main=.
 build=./build
@@ -18,10 +18,10 @@ reportString=./src/ReportString
 outputChecker=./src/OutputChecker
 
 main_dep=./build/yce.a
-make: $(main)/main.cpp $(main_dep)
+$(main)/main: $(main)/main.cpp $(main_dep)
 	g++ main.cpp $(main_dep) -o main $(opt)
 
-yce_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o $(build)/ReportString.o
+yce_dep=$(build)/Executor.o $(build)/Command.o $(build)/Report.o $(build)/ytime.o $(build)/Transaction.o $(build)/ParallelCommand.o $(build)/ParallelTransaction.o $(build)/ATransaction.o $(build)/Result.o $(build)/ReportString.o $(build)/AOutputChecker.o
 $(build)/yce.a: $(yce_dep)
 	ar rcs build/yce.a build/*.o
 
@@ -79,3 +79,7 @@ rclean:
 
 clean:
 	rm -f $(main)/main
+
+rc:
+	rm -f $(main)/main
+	find . -name "*.[ao]" -delete

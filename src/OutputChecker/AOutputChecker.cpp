@@ -5,7 +5,7 @@
 using std::map;
 using std::string;
 
-map<string, string> AOutputChecker::getValuesMap()
+map<string, string> AOutputChecker::GetValuesMap()
 {
     return values;
 }

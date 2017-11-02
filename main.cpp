@@ -15,12 +15,35 @@ using std::endl;
 using std::shared_ptr;
 using std::make_shared;
 
+#include "src/OutputChecker/IStdoutChecker.h"
+
+class stdouttest : public IStdoutChecker
+{
+    Result Check(string allOutput)
+    {
+        cout << "Output Checker: " << allOutput;
+        return SUCCESSFUL;
+    }
+
+    string GetSuccessDescription() { return "Succ"; }
+
+    string GetFatalDescription() { return "Fatal"; }
+
+    string GetIgnoredDescription() { return "Ignored"; }
+
+    string GetLastReportNumber() { return "TEST-0001"; }
+};
+
 int main(int argc, char *argv[])
 {
     Executor executor;
     shared_ptr<ParallelTransaction> transaction = make_shared<ParallelTransaction>();
 
-    transaction->AddCommand(make_shared<ParallelCommand>("./test_programs/print1"));
+    shared_ptr<ParallelCommand> tmp = make_shared<ParallelCommand>("./test_programs/print1");
+
+    tmp->AddStdoutChecker(make_shared<stdouttest>());
+
+    transaction->AddCommand(tmp);
     transaction->AddCommand(make_shared<ParallelCommand>("./test_programs/print2"));
 
     executor.AddRunnable(transaction);

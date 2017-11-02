@@ -13,6 +13,7 @@
 #include "../../OutputChecker/AOutputChecker.h"
 #include "../../OutputChecker/IStdoutChecker.h"
 #include "../../OutputChecker/IStderrChecker.h"
+#include "../../../Settings.h"
 
 using std::list;
 using std::string;
